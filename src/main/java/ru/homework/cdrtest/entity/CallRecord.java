@@ -1,0 +1,78 @@
+package ru.homework.cdrtest.entity;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "call_record")
+public class CallRecord {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @ManyToOne
+    @JoinColumn(name = "phone_number_id")
+    private PhoneNumber phoneNumber; // номер абонента
+
+    @Column(name = "call_type_code")
+    @Enumerated(EnumType.ORDINAL)
+    private CallType callType; // тип вызова (01 - исходящие, 02 - входящие)
+    @Column(name = "call_start")
+    private LocalDateTime callStart; // дата и время начала звонка
+    @Column(name = "call_end")
+    private LocalDateTime callEnd; // дата и время окончания звонка
+
+
+    public CallRecord() {
+
+    }
+
+    public CallRecord(Long id, PhoneNumber phoneNumber, CallType callType, LocalDateTime callStart, LocalDateTime callEnd) {
+        this.id = id;
+        this.phoneNumber = phoneNumber;
+        this.callType = callType;
+        this.callStart = callStart;
+        this.callEnd = callEnd;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public PhoneNumber getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(PhoneNumber phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public CallType getCallType() {
+        return callType;
+    }
+
+    public void setCallType(CallType callType) {
+        this.callType = callType;
+    }
+
+    public LocalDateTime getCallStart() {
+        return callStart;
+    }
+
+    public void setCallStart(LocalDateTime callStart) {
+        this.callStart = callStart;
+    }
+
+    public LocalDateTime getCallEnd() {
+        return callEnd;
+    }
+
+    public void setCallEnd(LocalDateTime callEnd) {
+        this.callEnd = callEnd;
+    }
+}
