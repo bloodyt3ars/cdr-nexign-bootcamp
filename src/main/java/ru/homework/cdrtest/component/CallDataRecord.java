@@ -1,4 +1,4 @@
-package ru.homework.cdrtest.services;
+package ru.homework.cdrtest.component;
 
 import org.springframework.stereotype.Component;
 import ru.homework.cdrtest.entity.CallRecord;

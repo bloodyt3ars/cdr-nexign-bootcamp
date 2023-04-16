@@ -73,7 +73,13 @@
 			<artifactId>spring-data-rest-repository</artifactId>
 			<version>1.0.0.RELEASE</version>
 		</dependency>
-		<!--		<dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--		<dependency>
                     <groupId>org.springframework.security</groupId>
                     <artifactId>spring-security-test</artifactId>
                     <scope>test</scope>

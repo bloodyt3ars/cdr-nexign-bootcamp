@@ -1,4 +1,4 @@
-package ru.homework.cdrtest.services;
+package ru.homework.cdrtest.component;
 
 import org.springframework.stereotype.Component;
 import ru.homework.cdrtest.entity.PhoneNumber;
@@ -21,7 +21,5 @@ public class BillingRealTime {
 
     public void selectUserWithPositiveBalance(){
         List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAllByBalanceGreaterThan(0);
-
-
     }
 }

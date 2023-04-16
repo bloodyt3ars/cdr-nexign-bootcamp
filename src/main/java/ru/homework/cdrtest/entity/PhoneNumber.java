@@ -1,6 +1,7 @@
 package ru.homework.cdrtest.entity;
 
 import jakarta.persistence.*;
+import org.jetbrains.annotations.Contract;
 
 @Entity
 @Table(name = "phone_number")
@@ -22,6 +23,8 @@ public class PhoneNumber {
     @Enumerated(EnumType.STRING)
     private TariffType tariffType;
 
+    private int freeMinute;
+
 
     public PhoneNumber(Long id, String phoneNumber, int balance, Abonent abonent, TariffType tariffType) {
         this.id = id;
@@ -29,6 +32,7 @@ public class PhoneNumber {
         this.balance = balance;
         this.abonent = abonent;
         this.tariffType = tariffType;
+        this.freeMinute = tariffType.getFreeMinutes();
     }
 
     public PhoneNumber() {
