@@ -1,12 +1,12 @@
 package ru.homework.cdrtest.component;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.homework.cdrtest.entity.CallRecord;
 import ru.homework.cdrtest.entity.CallType;
 import ru.homework.cdrtest.entity.PhoneNumber;
 import ru.homework.cdrtest.entity.TariffType;
 import ru.homework.cdrtest.repository.CallRecordRepository;
-import ru.homework.cdrtest.repository.PhoneNumberRepository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -19,33 +19,60 @@ import java.util.Map;
 @Component
 public class HighPerfomanceRatingServer {
 
+    private final CallRecordRepository callRecordRepository;
 
-    private PhoneNumberRepository phoneNumberRepository;
-
-    private CallRecordRepository callRecordRepository;
-
-    public HighPerfomanceRatingServer(PhoneNumberRepository phoneNumberRepository, CallRecordRepository callRecordRepository) {
-        this.phoneNumberRepository = phoneNumberRepository;
+    public HighPerfomanceRatingServer(CallRecordRepository callRecordRepository) {
         this.callRecordRepository = callRecordRepository;
     }
 
-    public void calculate(List<PhoneNumber> phoneNumbers){
+    public List<Map> calculate(@NotNull PhoneNumber phoneNumber) {
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("id", phoneNumber.getId());
+        responseBody.put("numberPhone", phoneNumber.getPhoneNumber());
+        responseBody.put("tariff", phoneNumber.getTariffType().getName());
         List<Map> payload = new ArrayList<>();
-        for (PhoneNumber phoneNumber: phoneNumbers) {
-            TariffType tariffType = phoneNumber.getTariffType();
-            List<CallRecord> callRecords = callRecordRepository.findAllByPhoneNumber(phoneNumber);
-            for (CallRecord callRecord:callRecords) {
-                Map<String, String> map = new HashMap<>();
-                String callType = callRecord.getCallType().getName();
-                String startTime = formatDateTime(callRecord.getCallStart());
-                String callEnd = formatDateTime(callRecord.getCallEnd());
-                String duration = getCallDurationForPrint(callRecord.getCallStart(), callRecord.getCallEnd());
-                double cost =
+        TariffType tariffType = phoneNumber.getTariffType();
+        List<CallRecord> callRecords = callRecordRepository.findAllByPhoneNumber(phoneNumber);
+        double totalCost = tariffType.getFixedPrice();
+        int minutesRemain = tariffType.getFreeMinutes();
+        for (CallRecord callRecord : callRecords) {
+            Map<String, Object> map = new HashMap<>();
+            String callType = callRecord.getCallType().getName();
+            String startTime = formatDateTime(callRecord.getCallStart());
+            String callEnd = formatDateTime(callRecord.getCallEnd());
+            String duration = getCallDurationForPrint(callRecord.getCallStart(), callRecord.getCallEnd());
+            double cost = 0;
+            int dur = getCallDurationMinutes(callRecord.getCallStart(), callRecord.getCallEnd());
+            if (tariffType == TariffType.NORMAL) {
+                if (callRecord.getCallType() == CallType.INCOMING) {
+                    minutesRemain -= getCallDurationMinutes(callRecord.getCallStart(), callRecord.getCallEnd());
+                    cost = 0.00;
+                } else if (callRecord.getCallType() == CallType.OUTGOING) {
+                    cost = calculateNormalCost(minutesRemain, dur);
+                }
+            } else if (tariffType == TariffType.UNLIMITED_300) {
+                cost = calculateUnlimited300Cost(minutesRemain, dur);
+                minutesRemain -= getCallDurationMinutes(callRecord.getCallStart(), callRecord.getCallEnd());
+            } else if (tariffType == TariffType.PER_MINUTE) {
+                cost = calculatePerMinuteCost(dur);
+            } else {
+                throw new IllegalArgumentException("Unknown tariff type");
             }
-
+            map.put("callType", callType);
+            map.put("startTime", startTime);
+            map.put("callEnd", callEnd);
+            map.put("duration", duration);
+            map.put("cost", cost);
+            payload.add(map);
+            totalCost += cost;
         }
+        responseBody.put("payload", payload);
+        responseBody.put("totalCost", totalCost);
+        responseBody.put("monetaryUnit", "rubles");
 
-
+        List<Map> returnList = new ArrayList<>();
+        returnList.add(responseBody);
+        return returnList;
     }
 
     private String getCallDurationForPrint(LocalDateTime callStart, LocalDateTime callEnd) {
@@ -56,56 +83,45 @@ public class HighPerfomanceRatingServer {
         long sec = second / 1 % 60;
         return String.format("%02d:%02d:%02d", hour, min, sec);
     }
-    private int getCallDurationMinutes(LocalDateTime callStart,LocalDateTime callEnd) {
+
+    private int getCallDurationMinutes(LocalDateTime callStart, LocalDateTime callEnd) {
         Duration duration = Duration.between(callStart, callEnd);
-        if (duration.getSeconds() / 1 % 60 == 0.0){
+        if (duration.getSeconds() / 1 % 60 == 0.0) {
             return (int) duration.getSeconds() / 60;
-        }
-        else {
-            return ((int) duration.getSeconds() / 60)+1;
+        } else {
+            return ((int) duration.getSeconds() / 60) + 1;
         }
     }
-    private double calculateUnlimited300Cost(int freeMinutes) {
-        double cost = 0;
-        int duration = getCallDurationMinutes();
+
+    private double calculateUnlimited300Cost(int freeMinutes, int duration) {
+        double cost;
         if (freeMinutes >= 0) {
             cost = 0;
         } else {
-            if ((freeMinutes >= 0) && (duration > freeMinutes)){
-                cost = duration-freeMinutes * 1.0;
+            if ((freeMinutes >= 0) && (duration > freeMinutes)) {
+                cost = (duration - freeMinutes) * 1.0;
             } else {
                 cost = duration * 1.0;
             }
         }
-        this.cost = cost;
         return cost;
     }
 
-    private double calculatePerMinuteCost() {
-        int duration = getCallDurationMinutes();
-        this.cost = duration * 1.5;
+    private double calculatePerMinuteCost(int duration) {
         return duration * 1.5;
     }
 
-    //тут тоже
-    private double calculateNormalCost(int freeMinutes) {
-        double cost = 0;
-        int duration = getCallDurationMinutes();
-        if (callType == CallType.INCOMING) {
-            cost = 0;
+    private double calculateNormalCost(int freeMinutes, int duration) {
+        double cost;
+        if ((freeMinutes >= 0) && (duration < freeMinutes)) {
+            cost = duration * 0.5;
+        } else if ((freeMinutes >= 0) && (duration > freeMinutes)) {
+            cost = freeMinutes * 0.5 + (duration - freeMinutes) * 1.5;
         } else {
-            if ((freeMinutes >= 0) && (duration < freeMinutes)) {
-                cost = duration * 0.5;
-            } else if ((freeMinutes >= 0) && (duration > freeMinutes)){
-                cost = freeMinutes * 0.5 + duration-freeMinutes * 1.5;
-            } else {
-                cost = duration * 1.5;
-            }
+            cost = duration * 1.5;
         }
-        this.cost = cost;
         return cost;
     }
-
 
     private static String formatDateTime(LocalDateTime dt) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss0");

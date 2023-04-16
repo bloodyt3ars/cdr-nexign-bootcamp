@@ -15,8 +15,8 @@ import java.util.Random;
 
 @Component
 public class CallDataRecord {
-    private PhoneNumberRepository phoneNumberRepository;
-    private CallRecordRepository callRecordRepository;
+    private final PhoneNumberRepository phoneNumberRepository;
+    private final CallRecordRepository callRecordRepository;
 
     private static int month = 1;
 
@@ -26,10 +26,9 @@ public class CallDataRecord {
     }
 
 
-    public  List<CallRecord> generateCDR(){
+    public void generateCDR(){
         List<CallRecord> callRecords = new ArrayList<>();
-        List<PhoneNumber> phoneNumbers = new ArrayList<>();
-        phoneNumbers = phoneNumberRepository.findAll();
+        List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAllByBalanceGreaterThan(0);
         callRecordRepository.deleteAll();
         for (PhoneNumber phoneNumber: phoneNumbers) {
             Random random = new Random();
@@ -49,7 +48,6 @@ public class CallDataRecord {
         monthSetup();
         Collections.sort(callRecords);
         callRecordRepository.saveAll(callRecords);
-        return callRecords;
     }
 
 
@@ -64,7 +62,7 @@ public class CallDataRecord {
     private LocalDateTime getRandomDateTime() {//Надо подправить, чтобы небыло пересекающихся звонков у одного абонента
         Random random = new Random();
         int year = 2022;
-        int month = this.month;
+        int month = CallDataRecord.month;
         int day = random.nextInt(28) + 1;
         int hour = random.nextInt(24);
         int minute = random.nextInt(60);

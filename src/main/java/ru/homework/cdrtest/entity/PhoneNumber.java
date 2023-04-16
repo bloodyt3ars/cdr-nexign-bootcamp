@@ -1,7 +1,6 @@
 package ru.homework.cdrtest.entity;
 
 import jakarta.persistence.*;
-import org.jetbrains.annotations.Contract;
 
 @Entity
 @Table(name = "phone_number")
@@ -13,7 +12,7 @@ public class PhoneNumber {
     @Column(name = "phone_number")
     private String phoneNumber;
     @Column(name = "current_balance")
-    private int balance;
+    private double balance;
 
     @ManyToOne
     @JoinColumn(name = "abonent_id")
@@ -26,7 +25,7 @@ public class PhoneNumber {
     private int freeMinute;
 
 
-    public PhoneNumber(Long id, String phoneNumber, int balance, Abonent abonent, TariffType tariffType) {
+    public PhoneNumber(Long id, String phoneNumber, double balance, Abonent abonent, TariffType tariffType) {
         this.id = id;
         this.phoneNumber = phoneNumber;
         this.balance = balance;
@@ -38,6 +37,7 @@ public class PhoneNumber {
     public PhoneNumber() {
 
     }
+
 
     public Long getId() {
         return id;
@@ -55,11 +55,11 @@ public class PhoneNumber {
         this.phoneNumber = phoneNumber;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 

@@ -1,26 +1,56 @@
 package ru.homework.cdrtest.controller;
 
 import org.springframework.web.bind.annotation.*;
+import ru.homework.cdrtest.component.HighPerfomanceRatingServer;
+import ru.homework.cdrtest.entity.PhoneNumber;
+import ru.homework.cdrtest.repository.PhoneNumberRepository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/v1/abonent")
-public class AbonentController {
+@RequestMapping("abonent")
+public class AbonentController implements Controller{
 
-    @GetMapping
-    public Map<String, String> hello(){
-        Map<String, String> hello = new HashMap<>();
-        hello.put("Hello", "World");
-        return hello;
+    HighPerfomanceRatingServer highPerfomanceRatingServer;
+    PhoneNumberRepository phoneNumberRepository;
+
+    public AbonentController(HighPerfomanceRatingServer highPerfomanceRatingServer, PhoneNumberRepository phoneNumberRepository) {
+        this.highPerfomanceRatingServer = highPerfomanceRatingServer;
+        this.phoneNumberRepository = phoneNumberRepository;
     }
+
     @PatchMapping("/pay")
-    public String pay(@RequestParam(name = "numberPhone") String numberPhone,@RequestParam(name = "money") int money){
-        return numberPhone + " " + money;
+    public Map<String, Object> pay(@RequestParam(name = "numberPhone") String numberPhone,@RequestParam(name = "money") int money){
+        Map<String, Object> responseBody = new HashMap<>();
+        PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
+        if (phoneNumber!=null){
+            phoneNumber.setBalance(phoneNumber.getBalance()+money);
+            phoneNumberRepository.save(phoneNumber);
+            responseBody.put("id", phoneNumber.getId());
+            responseBody.put("numberPhone", phoneNumber.getPhoneNumber());
+            responseBody.put("money", phoneNumber.getBalance());
+        }
+        else {
+            responseBody.put("exception", "phone number not found");
+        }
+        return responseBody;
     }
     @GetMapping("/report/{numberPhone}")
-    public String report(@PathVariable("numberPhone") String numberPhone){
-        return "report for " + numberPhone;
+    public List<Map> report(@PathVariable("numberPhone")String numberPhone){
+        PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
+        if (phoneNumber!=null){
+            return highPerfomanceRatingServer.calculate(phoneNumber);
+        }
+        else {
+            List<Map> responseBody = new ArrayList<>();
+            Map<String,String> map = new HashMap<>();
+            map.put("exception", "phone number not found");
+            responseBody.add(map);
+            return responseBody;
+        }
+
     }
 }

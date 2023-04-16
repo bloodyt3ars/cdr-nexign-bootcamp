@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PhoneNumberRepository extends JpaRepository<PhoneNumber, Long> {
     List<PhoneNumber> findAllByBalanceGreaterThan(int i);
+    PhoneNumber findPhoneNumberByPhoneNumber(String numberPhone);
 }

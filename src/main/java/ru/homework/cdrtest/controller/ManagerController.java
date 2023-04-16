@@ -1,29 +1,90 @@
 package ru.homework.cdrtest.controller;
 
 import org.springframework.web.bind.annotation.*;
+import ru.homework.cdrtest.component.BillingRealTime;
+import ru.homework.cdrtest.entity.PhoneNumber;
+import ru.homework.cdrtest.entity.TariffType;
+import ru.homework.cdrtest.repository.PhoneNumberRepository;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
-@RequestMapping("api/v1/manager")
-public class ManagerController {
+@RequestMapping("manager")
+public class ManagerController implements Controller {
+
+    PhoneNumberRepository phoneNumberRepository;
+    BillingRealTime billingRealTime;
+
+    public ManagerController(PhoneNumberRepository phoneNumberRepository, BillingRealTime billingRealTime) {
+        this.phoneNumberRepository = phoneNumberRepository;
+        this.billingRealTime = billingRealTime;
+    }
 
     @PatchMapping("chaneTariff")
-    public String changeTariff(@RequestParam(name = "numberPhone") String numberPhone,
-                               @RequestParam(name = "tariffId") String tariffId){
-        return "Tariff change for " + numberPhone + " to " + tariffId;
+    public Map<String, Object> changeTariff(@RequestParam(name = "numberPhone") String numberPhone,
+                            @RequestParam(name = "tariffId") String tariffId) {
+        Map<String, Object> responseBody = new HashMap<>();
+        PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
+        if (phoneNumber != null) {
+            TariffType tariffType = null;
+            for (TariffType type : TariffType.values()) {
+                if (type.getCode().equals(tariffId)) {
+                    tariffType = type;
+                }
+            }
+            if (tariffType == null) {
+                responseBody.put("exception", "tariff not found");
+            } else {
+                phoneNumber.setTariffType(tariffType);
+                phoneNumberRepository.save(phoneNumber);
+                responseBody.put("id", phoneNumber.getId());
+                responseBody.put("numberPhone", phoneNumber.getPhoneNumber());
+                responseBody.put("money", phoneNumber.getBalance());
+            }
+
+        } else {
+            responseBody.put("exception", "phone number not found");
+        }
+        return responseBody;
     }
+
     @PostMapping("abonent")
-    public String createNewAbonent(@RequestParam(name = "numberPhone") String numberPhone,
-                                   @RequestParam(name = "tariffId") String tariffId,
-                                   @RequestParam(name = "balance") int balance){
-        return "new abonent " + numberPhone + " with tarriff " + tariffId + " with balance " + balance;
+    public Map<String, Object> createNewAbonent(@RequestParam(name = "numberPhone") String numberPhone,
+                                                @RequestParam(name = "tariffId") String tariffId,
+                                                @RequestParam(name = "balance") int balance) {
+        Map<String, Object> responseBody = new HashMap<>();
+        TariffType tariffType = null;
+        for (TariffType type : TariffType.values()) {
+            if (type.getCode().equals(tariffId)) {
+                tariffType = type;
+            }
+        }
+        if (tariffType == null) {
+            responseBody.put("exception", "tariff not found");
+        } else if (phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone)!=null) {
+            responseBody.put("exception", "phone number already exist");
+        } else {
+            PhoneNumber phoneNumber = new PhoneNumber();
+            phoneNumber.setPhoneNumber(numberPhone);
+            phoneNumber.setTariffType(tariffType);
+            phoneNumber.setBalance(balance);
+            phoneNumberRepository.save(phoneNumber);//номер телефона уникальный, надо обработать уже имеющихся значений
+            responseBody.put("numberPhone", phoneNumber.getPhoneNumber());
+            responseBody.put("tariff_id", phoneNumber.getTariffType().getCode());
+            responseBody.put("balance", phoneNumber.getBalance());
+        }
+        return responseBody;
     }
+
     @PatchMapping("billing")
-    public String billing(@RequestParam(name = "action") String action){
-        if (action.equals("run")){
-            return "action : run";
+    public Map<String, Object> billing(@RequestParam(name = "action") String action) {
+        Map<String, Object> responseBody = new HashMap<>();
+        if (action.equals("run")) {
+            responseBody = billingRealTime.billing();
+        } else {
+            responseBody.put("exception", "unknown action");
         }
-        else {
-            return "null";
-        }
+        return responseBody;
     }
 }
