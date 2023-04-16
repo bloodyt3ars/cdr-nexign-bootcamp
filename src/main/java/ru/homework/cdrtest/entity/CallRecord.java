@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "call_record")
-public class CallRecord {
+public class CallRecord implements Comparable<CallRecord>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -74,5 +74,14 @@ public class CallRecord {
 
     public void setCallEnd(LocalDateTime callEnd) {
         this.callEnd = callEnd;
+    }
+
+    @Override
+    public int compareTo(CallRecord o) {
+        if(callStart.compareTo(o.getCallStart()) < 0 )
+            return -1;
+        if(callStart.compareTo(o.getCallStart()) == 0 )
+            return 0;
+        return 1;
     }
 }
