@@ -1,5 +1,7 @@
 package ru.homework.cdrtest.controller;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.homework.cdrtest.component.HighPerfomanceRatingServer;
 import ru.homework.cdrtest.entity.PhoneNumber;
@@ -11,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("abonent")
+@RequestMapping(value = "abonent", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class AbonentController implements Controller{
 
     HighPerfomanceRatingServer highPerfomanceRatingServer;
@@ -22,8 +24,10 @@ public class AbonentController implements Controller{
         this.phoneNumberRepository = phoneNumberRepository;
     }
 
-    @PatchMapping("/pay")
-    public Map<String, Object> pay(@RequestParam(name = "numberPhone") String numberPhone,@RequestParam(name = "money") int money){
+    @PatchMapping(value = "/pay")
+    public ResponseEntity<?> pay(@RequestBody Map<String, Object> request){
+        String numberPhone = (String) request.get("numberPhone");
+        int money = (int) request.get("money");
         Map<String, Object> responseBody = new HashMap<>();
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
         if (phoneNumber!=null){
@@ -36,7 +40,7 @@ public class AbonentController implements Controller{
         else {
             responseBody.put("exception", "phone number not found");
         }
-        return responseBody;
+        return ResponseEntity.ok(responseBody);
     }
     @GetMapping("/report/{numberPhone}")
     public List<Map> report(@PathVariable("numberPhone")String numberPhone){
@@ -51,6 +55,5 @@ public class AbonentController implements Controller{
             responseBody.add(map);
             return responseBody;
         }
-
     }
 }

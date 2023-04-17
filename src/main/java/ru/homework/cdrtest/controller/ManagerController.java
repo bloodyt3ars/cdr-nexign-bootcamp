@@ -1,5 +1,6 @@
 package ru.homework.cdrtest.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.homework.cdrtest.component.BillingRealTime;
 import ru.homework.cdrtest.entity.PhoneNumber;
@@ -22,8 +23,9 @@ public class ManagerController implements Controller {
     }
 
     @PatchMapping("chaneTariff")
-    public Map<String, Object> changeTariff(@RequestParam(name = "numberPhone") String numberPhone,
-                            @RequestParam(name = "tariffId") String tariffId) {
+    public ResponseEntity<?> changeTariff(@RequestBody Map<String, Object> request) {
+        String numberPhone = (String) request.get("numberPhone");
+        String tariffId = (String) request.get("tariffId");
         Map<String, Object> responseBody = new HashMap<>();
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
         if (phoneNumber != null) {
@@ -46,40 +48,44 @@ public class ManagerController implements Controller {
         } else {
             responseBody.put("exception", "phone number not found");
         }
-        return responseBody;
+        return ResponseEntity.ok(responseBody);
     }
 
+
     @PostMapping("abonent")
-    public Map<String, Object> createNewAbonent(@RequestParam(name = "numberPhone") String numberPhone,
-                                                @RequestParam(name = "tariffId") String tariffId,
-                                                @RequestParam(name = "balance") int balance) {
+    public Map<String, Object> createNewAbonent(@RequestBody Map<String, Object> request) {
         Map<String, Object> responseBody = new HashMap<>();
-        TariffType tariffType = null;
-        for (TariffType type : TariffType.values()) {
-            if (type.getCode().equals(tariffId)) {
-                tariffType = type;
+        if (request.containsKey("numberPhone")&&request.containsKey("tariff_id")&&request.containsKey("balance")){
+            String numberPhone = (String) request.get("numberPhone");
+            String tariffId = (String) request.get("tariff_id");
+            int balance = (int) request.get("balance");
+            PhoneNumber phoneNumber = new PhoneNumber();
+            phoneNumber.setTariffType(tariffId);
+            if (phoneNumber.getTariffType() == null) {
+                responseBody.put("exception", "tariff not found");
+            } else if (phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone)!=null) {
+                responseBody.put("exception", "phone number already exist");
+            } else if (balance<0) {
+                responseBody.put("exception", "balance cannot be negative");
+            } else {
+                phoneNumber.setPhoneNumber(numberPhone);
+                phoneNumber.setBalance(balance);
+                phoneNumberRepository.save(phoneNumber);//номер телефона уникальный, надо обработать уже имеющихся значений
+                responseBody.put("numberPhone", phoneNumber.getPhoneNumber());
+                responseBody.put("tariff_id", phoneNumber.getTariffType().getCode());
+                responseBody.put("balance", phoneNumber.getBalance());
             }
         }
-        if (tariffType == null) {
-            responseBody.put("exception", "tariff not found");
-        } else if (phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone)!=null) {
-            responseBody.put("exception", "phone number already exist");
-        } else {
-            PhoneNumber phoneNumber = new PhoneNumber();
-            phoneNumber.setPhoneNumber(numberPhone);
-            phoneNumber.setTariffType(tariffType);
-            phoneNumber.setBalance(balance);
-            phoneNumberRepository.save(phoneNumber);//номер телефона уникальный, надо обработать уже имеющихся значений
-            responseBody.put("numberPhone", phoneNumber.getPhoneNumber());
-            responseBody.put("tariff_id", phoneNumber.getTariffType().getCode());
-            responseBody.put("balance", phoneNumber.getBalance());
+        else {
+            responseBody.put("exception", "miss argument");
         }
         return responseBody;
     }
 
     @PatchMapping("billing")
-    public Map<String, Object> billing(@RequestParam(name = "action") String action) {
+    public Map<String, Object> billing(@RequestBody Map<String, Object> request) {
         Map<String, Object> responseBody = new HashMap<>();
+        String action = (String) request.get("action");
         if (action.equals("run")) {
             responseBody = billingRealTime.billing();
         } else {

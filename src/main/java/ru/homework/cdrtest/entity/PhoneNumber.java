@@ -78,4 +78,12 @@ public class PhoneNumber {
     public void setTariffType(TariffType tariffType) {
         this.tariffType = tariffType;
     }
+
+    public void setTariffType(String tariffId){
+        for (TariffType type : TariffType.values()) {
+            if (type.getCode().equals(tariffId)) {
+                this.tariffType = type;
+            }
+        }
+    }
 }
