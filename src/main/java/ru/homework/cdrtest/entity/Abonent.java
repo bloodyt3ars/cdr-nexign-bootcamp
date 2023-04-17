@@ -11,7 +11,6 @@ public class Abonent {
     @Column(name = "last_name")
     private String lastName;
     @Column(name = "role_id")
-    @Enumerated(EnumType.ORDINAL)
     private Role role;
 
     public Abonent() {

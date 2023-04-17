@@ -32,7 +32,7 @@ CREATE TABLE abonent (
 CREATE TABLE phone_number (
                               id SERIAL NOT NULL,
                               phone_number VARCHAR(25) NOT NULL,
-                              balance NUMERIC(6,2) NOT NULL,
+                              balance double precision NOT NULL,
                               abonent_id INTEGER NOT NULL,
                               tariff_type_id INTEGER NOT NULL,
                               CONSTRAINT phone_number_pk PRIMARY KEY (id),
@@ -58,8 +58,8 @@ CREATE TABLE call_record (
 
 CREATE TABLE phone_number_balance_history (
                                               id SERIAL NOT NULL,
-                                              old_balance NUMERIC(6,2) NOT NULL,
-                                              new_balance NUMERIC(6,2) NOT NULL,
+                                              old_balance double precision NOT NULL,
+                                              new_balance double precision NOT NULL,
                                               change_date TIMESTAMP NOT NULL,
                                               phone_number_id INTEGER NOT NULL,
                                               CONSTRAINT phone_number_balance_history_pk PRIMARY KEY (id),
@@ -115,5 +115,11 @@ CREATE TRIGGER tr_update_phone_number_balance_history
     AFTER UPDATE OF balance ON phone_number
     FOR EACH ROW
 EXECUTE FUNCTION update_phone_number_balance_history();
+
+INSERT INTO abonent (first_name, last_name, role_id) VALUES ('Ivan', 'Ivanov', 1);
+
+INSERT INTO abonent (first_name, last_name, role_id) VALUES ('Petr', 'Petrov', 2);
+
+
 
 

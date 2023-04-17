@@ -16,7 +16,6 @@ public class CallRecord implements Comparable<CallRecord>{
     private PhoneNumber phoneNumber; // номер абонента
 
     @Column(name = "call_type_code")
-    @Enumerated(EnumType.ORDINAL)
     private CallType callType; // тип вызова (01 - исходящие, 02 - входящие)
     @Column(name = "call_start")
     private LocalDateTime callStart; // дата и время начала звонка

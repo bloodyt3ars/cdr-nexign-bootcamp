@@ -11,7 +11,7 @@ public class PhoneNumber {
     private Long id;
     @Column(name = "phone_number")
     private String phoneNumber;
-    @Column(name = "current_balance")
+    @Column(name = "balance")
     private double balance;
 
     @ManyToOne
@@ -19,7 +19,6 @@ public class PhoneNumber {
     private Abonent abonent;
 
     @Column(name = "tariff_type_id")
-    @Enumerated(EnumType.STRING)
     private TariffType tariffType;
 
     private int freeMinute;
