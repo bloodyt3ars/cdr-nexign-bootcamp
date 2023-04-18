@@ -66,7 +66,7 @@ public class ManagerController implements Controller {
             int balance = (int) request.get("balance");
             PhoneNumber phoneNumber = new PhoneNumber();
             phoneNumber.setTariffType(tariffId);
-            phoneNumber.setAbonent(abonentRepository.getById(1L));
+            phoneNumber.setAbonent(abonentRepository.getReferenceById(1L));
             if (phoneNumber.getTariffType() == null) {
                 responseBody.put("exception", "tariff not found");
             } else if (phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone) != null) {
