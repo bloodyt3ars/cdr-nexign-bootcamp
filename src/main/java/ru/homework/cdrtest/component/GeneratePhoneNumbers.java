@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.homework.cdrtest.entity.Abonent;
 import ru.homework.cdrtest.entity.PhoneNumber;
 import ru.homework.cdrtest.entity.TariffType;
-import ru.homework.cdrtest.repository.AbonentRepostiry;
+import ru.homework.cdrtest.repository.AbonentRepository;
 import ru.homework.cdrtest.repository.PhoneNumberRepository;
 
 import java.util.Random;
@@ -16,11 +16,11 @@ public class GeneratePhoneNumbers {
     private static final Random random = new Random();
     private final PhoneNumberRepository phoneNumberRepository;
 
-    private final AbonentRepostiry abonentRepostiry;
+    private final AbonentRepository abonentRepository;
 
-    public GeneratePhoneNumbers(PhoneNumberRepository phoneNumberRepository, AbonentRepostiry abonentRepostiry) {
+    public GeneratePhoneNumbers(PhoneNumberRepository phoneNumberRepository, AbonentRepository abonentRepository) {
         this.phoneNumberRepository = phoneNumberRepository;
-        this.abonentRepostiry = abonentRepostiry;
+        this.abonentRepository = abonentRepository;
     }
 
     public void generate(int n) {
@@ -29,7 +29,7 @@ public class GeneratePhoneNumbers {
             String generatePhoneNumber = generatePhoneNumber();
             double balance = Math.ceil(random.nextDouble(1000) * 100) / 100;
             long abonent_id = 1;
-            Abonent byId = abonentRepostiry.findById(abonent_id).orElse(null);
+            Abonent byId = abonentRepository.findById(abonent_id).orElse(null);
             int tariff_type_id = random.nextInt(TariffType.values().length);
             TariffType tariffType = TariffType.values()[tariff_type_id];
             PhoneNumber phoneNumber = new PhoneNumber();

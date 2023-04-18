@@ -11,10 +11,7 @@ import ru.homework.cdrtest.repository.CallRecordRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class HighPerfomanceRatingServer {
@@ -26,17 +23,17 @@ public class HighPerfomanceRatingServer {
     }
 
     public List<Map> calculate(@NotNull PhoneNumber phoneNumber) {
-        Map<String, Object> responseBody = new HashMap<>();
+        Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("id", phoneNumber.getId());
         responseBody.put("numberPhone", phoneNumber.getPhoneNumber());
         responseBody.put("tariff", phoneNumber.getTariffType().getName());
         List<Map> payload = new ArrayList<>();
         TariffType tariffType = phoneNumber.getTariffType();
-        List<CallRecord> callRecords = callRecordRepository.findAllByPhoneNumber(phoneNumber);
+        List<CallRecord> callRecords = callRecordRepository.findAllByMonthAndPhoneNumber(CallDataRecord.getMonth(), phoneNumber);
         double totalCost = tariffType.getFixedPrice();
         int minutesRemain = tariffType.getFreeMinutes();
         for (CallRecord callRecord : callRecords) {
-            Map<String, Object> map = new HashMap<>();
+            Map<String, Object> map = new LinkedHashMap<>();
             String callType = callRecord.getCallType().getName();
             String startTime = formatDateTime(callRecord.getCallStart());
             String callEnd = formatDateTime(callRecord.getCallEnd());
@@ -45,10 +42,10 @@ public class HighPerfomanceRatingServer {
             int dur = getCallDurationMinutes(callRecord.getCallStart(), callRecord.getCallEnd());
             if (tariffType == TariffType.NORMAL) {
                 if (callRecord.getCallType() == CallType.INCOMING) {
-                    minutesRemain -= getCallDurationMinutes(callRecord.getCallStart(), callRecord.getCallEnd());
                     cost = 0.00;
                 } else if (callRecord.getCallType() == CallType.OUTGOING) {
                     cost = calculateNormalCost(minutesRemain, dur);
+                    minutesRemain -= getCallDurationMinutes(callRecord.getCallStart(), callRecord.getCallEnd());
                 }
             } else if (tariffType == TariffType.UNLIMITED_300) {
                 cost = calculateUnlimited300Cost(minutesRemain, dur);
@@ -95,7 +92,7 @@ public class HighPerfomanceRatingServer {
 
     private double calculateUnlimited300Cost(int freeMinutes, int duration) {
         double cost;
-        if (freeMinutes >= 0) {
+        if ((freeMinutes >= 0) && (duration < freeMinutes)) {
             cost = 0;
         } else {
             if ((freeMinutes >= 0) && (duration > freeMinutes)) {

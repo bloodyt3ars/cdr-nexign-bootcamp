@@ -5,31 +5,36 @@ import org.springframework.web.bind.annotation.*;
 import ru.homework.cdrtest.component.BillingRealTime;
 import ru.homework.cdrtest.entity.PhoneNumber;
 import ru.homework.cdrtest.entity.TariffType;
+import ru.homework.cdrtest.repository.AbonentRepository;
 import ru.homework.cdrtest.repository.PhoneNumberRepository;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("manager")
 public class ManagerController implements Controller {
 
+
     PhoneNumberRepository phoneNumberRepository;
     BillingRealTime billingRealTime;
+    AbonentRepository abonentRepository;
 
-    public ManagerController(PhoneNumberRepository phoneNumberRepository, BillingRealTime billingRealTime) {
+    public ManagerController(PhoneNumberRepository phoneNumberRepository, BillingRealTime billingRealTime, AbonentRepository abonentRepository) {
         this.phoneNumberRepository = phoneNumberRepository;
         this.billingRealTime = billingRealTime;
+        this.abonentRepository = abonentRepository;
     }
+
 
     @PatchMapping("chaneTariff")
     public ResponseEntity<?> changeTariff(@RequestBody Map<String, Object> request) {
         String numberPhone = (String) request.get("numberPhone");
-        String tariffId = (String) request.get("tariffId");
-        Map<String, Object> responseBody = new HashMap<>();
+        String tariffId = (String) request.get("tariff_id");
+        Map<String, Object> responseBody = new LinkedHashMap<>();
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
+        TariffType tariffType = null;
         if (phoneNumber != null) {
-            TariffType tariffType = null;
             for (TariffType type : TariffType.values()) {
                 if (type.getCode().equals(tariffId)) {
                     tariffType = type;
@@ -54,18 +59,19 @@ public class ManagerController implements Controller {
 
     @PostMapping("abonent")
     public Map<String, Object> createNewAbonent(@RequestBody Map<String, Object> request) {
-        Map<String, Object> responseBody = new HashMap<>();
-        if (request.containsKey("numberPhone")&&request.containsKey("tariff_id")&&request.containsKey("balance")){
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        if (request.containsKey("numberPhone") && request.containsKey("tariff_id") && request.containsKey("balance")) {
             String numberPhone = (String) request.get("numberPhone");
             String tariffId = (String) request.get("tariff_id");
             int balance = (int) request.get("balance");
             PhoneNumber phoneNumber = new PhoneNumber();
             phoneNumber.setTariffType(tariffId);
+            phoneNumber.setAbonent(abonentRepository.getById(1L));
             if (phoneNumber.getTariffType() == null) {
                 responseBody.put("exception", "tariff not found");
-            } else if (phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone)!=null) {
+            } else if (phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone) != null) {
                 responseBody.put("exception", "phone number already exist");
-            } else if (balance<0) {
+            } else if (balance < 0) {
                 responseBody.put("exception", "balance cannot be negative");
             } else {
                 phoneNumber.setPhoneNumber(numberPhone);
@@ -75,8 +81,7 @@ public class ManagerController implements Controller {
                 responseBody.put("tariff_id", phoneNumber.getTariffType().getCode());
                 responseBody.put("balance", phoneNumber.getBalance());
             }
-        }
-        else {
+        } else {
             responseBody.put("exception", "miss argument");
         }
         return responseBody;
@@ -84,7 +89,7 @@ public class ManagerController implements Controller {
 
     @PatchMapping("billing")
     public Map<String, Object> billing(@RequestBody Map<String, Object> request) {
-        Map<String, Object> responseBody = new HashMap<>();
+        Map<String, Object> responseBody = new LinkedHashMap<>();
         String action = (String) request.get("action");
         if (action.equals("run")) {
             responseBody = billingRealTime.billing();

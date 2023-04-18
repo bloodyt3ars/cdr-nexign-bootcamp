@@ -7,13 +7,10 @@ import ru.homework.cdrtest.component.HighPerfomanceRatingServer;
 import ru.homework.cdrtest.entity.PhoneNumber;
 import ru.homework.cdrtest.repository.PhoneNumberRepository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
-@RequestMapping(value = "abonent", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping("abonent")
 public class AbonentController implements Controller{
 
     HighPerfomanceRatingServer highPerfomanceRatingServer;
@@ -24,11 +21,11 @@ public class AbonentController implements Controller{
         this.phoneNumberRepository = phoneNumberRepository;
     }
 
-    @PatchMapping(value = "/pay")
-    public ResponseEntity<?> pay(@RequestBody Map<String, Object> request){
+    @PatchMapping( "pay")
+    public  Map<String, Object> pay(@RequestBody Map<String, Object> request){
         String numberPhone = (String) request.get("numberPhone");
         int money = (int) request.get("money");
-        Map<String, Object> responseBody = new HashMap<>();
+        Map<String, Object> responseBody = new LinkedHashMap<>();
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
         if (phoneNumber!=null){
             phoneNumber.setBalance(phoneNumber.getBalance()+money);
@@ -40,9 +37,9 @@ public class AbonentController implements Controller{
         else {
             responseBody.put("exception", "phone number not found");
         }
-        return ResponseEntity.ok(responseBody);
+        return responseBody;
     }
-    @GetMapping("/report/{numberPhone}")
+    @GetMapping("report/{numberPhone}")
     public List<Map> report(@PathVariable("numberPhone")String numberPhone){
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
         if (phoneNumber!=null){
@@ -50,7 +47,7 @@ public class AbonentController implements Controller{
         }
         else {
             List<Map> responseBody = new ArrayList<>();
-            Map<String,String> map = new HashMap<>();
+            Map<String,String> map = new LinkedHashMap<>();
             map.put("exception", "phone number not found");
             responseBody.add(map);
             return responseBody;

@@ -5,10 +5,7 @@ import ru.homework.cdrtest.entity.PhoneNumber;
 import ru.homework.cdrtest.repository.CallRecordRepository;
 import ru.homework.cdrtest.repository.PhoneNumberRepository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class BillingRealTime {
@@ -28,10 +25,10 @@ public class BillingRealTime {
     public Map<String, Object> billing(){
         callDataRecord.generateCDR();
         List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAllByBalanceGreaterThan(0);
-        Map<String, Object> responseBody = new HashMap<>();
+        Map<String, Object> responseBody = new LinkedHashMap<>();
         List<Map<String,Object>> numbers = new ArrayList<>();
         for (PhoneNumber phoneNumber: phoneNumbers) {
-            Map<String, Object> data = new HashMap<>();
+            Map<String, Object> data = new LinkedHashMap<>();
             double totalCost = (double) highPerfomanceRatingServer.calculate(phoneNumber).get(0).get("totalCost");
             phoneNumber.setBalance(phoneNumber.getBalance()-totalCost);
             phoneNumberRepository.save(phoneNumber);

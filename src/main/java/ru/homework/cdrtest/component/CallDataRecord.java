@@ -18,6 +18,8 @@ public class CallDataRecord {
     private final PhoneNumberRepository phoneNumberRepository;
     private final CallRecordRepository callRecordRepository;
 
+
+
     private static int month = 1;
 
     public CallDataRecord(PhoneNumberRepository phoneNumberRepository, CallRecordRepository callRecordRepository) {
@@ -29,7 +31,6 @@ public class CallDataRecord {
     public void generateCDR(){
         List<CallRecord> callRecords = new ArrayList<>();
         List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAllByBalanceGreaterThan(0);
-        callRecordRepository.deleteAll();
         for (PhoneNumber phoneNumber: phoneNumbers) {
             Random random = new Random();
             int n = random.nextInt(30);
@@ -74,6 +75,9 @@ public class CallDataRecord {
         if (month > 12){
             month=month-12;
         }
+    }
+    public static int getMonth() {
+        return month-1;
     }
 
 
