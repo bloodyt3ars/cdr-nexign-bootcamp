@@ -22,21 +22,29 @@ public class GeneratePhoneNumbers {
         this.phoneNumberRepository = phoneNumberRepository;
         this.abonentRepository = abonentRepository;
     }
-
-    public void generate(int n) {
-
+    /*
+    Этот код генерирует заданное количество телефонных номеров с рандомным балансом
+    и тарифным планом для указанного абонента.
+     */
+    public void generate(int n) {//Аргумент "n" задает количество номеров, которые будут сгенерированы.
         for (int i = 0; i < n; i++) {
+            //Генерируется случайный телефонный номер с помощью метода generatePhoneNumber().
             String generatePhoneNumber = generatePhoneNumber();
+            //Генерируется случайный баланс с помощью класса Random.
             double balance = Math.ceil(random.nextDouble(1000) * 100) / 100;
+            //Получается абонент с помощью метода findById() из репозитория abonentRepository с заданным идентификатором "abonent_id".
             long abonent_id = 1;
             Abonent byId = abonentRepository.findById(abonent_id).orElse(null);
+            //Генерируется случайный тип тарифного плана из перечисления TariffType.
             int tariff_type_id = random.nextInt(TariffType.values().length);
             TariffType tariffType = TariffType.values()[tariff_type_id];
+            //Создается новый объект PhoneNumber и устанавливаются ему свойства: номер телефона, баланс, абонент и тип тарифного плана.
             PhoneNumber phoneNumber = new PhoneNumber();
             phoneNumber.setPhoneNumber(generatePhoneNumber);
             phoneNumber.setBalance(balance);
             phoneNumber.setAbonent(byId);
             phoneNumber.setTariffType(tariffType);
+            //Созданный объект PhoneNumber сохраняется в репозитории phoneNumberRepository с помощью метода save().
             phoneNumberRepository.save(phoneNumber);
         }
 

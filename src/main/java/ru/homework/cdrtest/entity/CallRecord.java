@@ -15,6 +15,10 @@ public class CallRecord implements Comparable<CallRecord>{
     @JoinColumn(name = "phone_number_id")
     private PhoneNumber phoneNumber; // номер абонента
 
+    /*@ManyToOne
+    @JoinColumn(name = "receiving_phone_number_id")
+    private PhoneNumber receivingPhoneNumber; // номер абонента принимающий звонок*/
+
     @Column(name = "call_type_code")
     private CallType callType; // тип вызова (01 - исходящие, 02 - входящие)
     @Column(name = "call_start")
@@ -34,6 +38,14 @@ public class CallRecord implements Comparable<CallRecord>{
         this.callStart = callStart;
         this.callEnd = callEnd;
     }
+    /*public CallRecord(Long id, PhoneNumber phoneNumber, PhoneNumber receivingPhoneNumber, CallType callType, LocalDateTime callStart, LocalDateTime callEnd) {
+        this.id = id;
+        this.phoneNumber = phoneNumber;
+        this.receivingPhoneNumber = receivingPhoneNumber;
+        this.callType = callType;
+        this.callStart = callStart;
+        this.callEnd = callEnd;
+    }*/
 
     public Long getId() {
         return id;
@@ -50,6 +62,14 @@ public class CallRecord implements Comparable<CallRecord>{
     public void setPhoneNumber(PhoneNumber phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    /*public PhoneNumber getReceivingPhoneNumber() {
+        return receivingPhoneNumber;
+    }
+
+    public void setReceivingPhoneNumber(PhoneNumber receivingPhoneNumber) {
+        this.receivingPhoneNumber = receivingPhoneNumber;
+    }*/
 
     public CallType getCallType() {
         return callType;

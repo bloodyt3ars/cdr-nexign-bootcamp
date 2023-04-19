@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface PhoneNumberBalanceHistoryRepository extends JpaRepository<PhoneNumberBalanceHistory, Long> {
 
+    //позволяет получить все записи из таблицы для заданного телефонного номера
     List<PhoneNumberBalanceHistory> findAllByPhoneNumber(PhoneNumber phoneNumber);
 }

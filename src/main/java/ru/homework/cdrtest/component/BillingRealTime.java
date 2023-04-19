@@ -23,17 +23,20 @@ public class BillingRealTime {
     }
 
     public Map<String, Object> billing(){
-        callDataRecord.generateCDR();
+        callDataRecord.generateCDR();//Вызываем метод, который генерирует звонки
         List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAllByBalanceGreaterThan(0);
         Map<String, Object> responseBody = new LinkedHashMap<>();
         List<Map<String,Object>> numbers = new ArrayList<>();
         for (PhoneNumber phoneNumber: phoneNumbers) {
             Map<String, Object> data = new LinkedHashMap<>();
+            // Для каждого номера телефона нам нужен только итоговая стоимость звонков за все месяца
             double totalCost = (double) highPerfomanceRatingServer.calculate(phoneNumber).get(0).get("totalCost");
+            // Изменяем баланс
             phoneNumber.setBalance(phoneNumber.getBalance()-totalCost);
+            //Обновляем сущность в бд
             phoneNumberRepository.save(phoneNumber);
-            data.put("phoneNumber", phoneNumber.getPhoneNumber());
-            data.put("balance", phoneNumber.getBalance());
+            data.put("phoneNumber", phoneNumber.getPhoneNumber()); //Для вывода в CRM
+            data.put("balance", phoneNumber.getBalance()); //Для вывода в CRM
             numbers.add(data);
         }
         responseBody.put("numbers", numbers);
