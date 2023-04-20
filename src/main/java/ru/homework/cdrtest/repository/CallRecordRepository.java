@@ -32,5 +32,5 @@ public interface CallRecordRepository extends JpaRepository<CallRecord, Long> {
                                                          @Param("phoneNumber") PhoneNumber phoneNumber);
 
     //возвращает список записей звонков для заданного телефонного номера.
-    List<CallRecord> findAllByReceivingPhoneNumber(PhoneNumber phoneNumber);
+    /*List<CallRecord> findAllByReceivingPhoneNumber(PhoneNumber phoneNumber);*/
 }
