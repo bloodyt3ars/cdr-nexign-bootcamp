@@ -41,9 +41,10 @@ public class HighPerfomanceRatingServer {
         responseBody.put("tariff", phoneNumber.getTariffType().getName());
         // Создаем список для хранения результата каждого звонка
         List<Map> payload = new ArrayList<>();
-        // Получаем тарифный план и список звонков за текущий месяц для номера телефона
+        // Получаем тарифный план и список звонков за текущий месяц и год для номера телефона
         TariffType tariffType = phoneNumber.getTariffType();
-        List<CallRecord> callRecords = callRecordRepository.findAllByMonthAndPhoneNumber(CallDataRecord.getMonth(), phoneNumber);
+        List<CallRecord> callRecords = callRecordRepository.findAllByMonthAndYearAndPhoneNumber(CallDataRecord.getMonth(),
+                CallDataRecord.getYear(), phoneNumber);
         // Инициализируем общую стоимость звонков и количество оставшихся бесплатных минут
         double totalCost = tariffType.getFixedPrice();
         int minutesRemain = tariffType.getFreeMinutes();

@@ -3,6 +3,7 @@ package ru.homework.cdrtest;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import ru.homework.cdrtest.component.CallDataRecord;
 import ru.homework.cdrtest.component.GeneratePhoneNumbers;
 import ru.homework.cdrtest.repository.CallRecordRepository;
 import ru.homework.cdrtest.repository.PhoneNumberBalanceHistoryRepository;
@@ -25,7 +26,9 @@ public class CdrTestApplication {
 
 		GeneratePhoneNumbers generatePhoneNumbers = run.getBean(GeneratePhoneNumbers.class);
 		generatePhoneNumbers.generate(10);
+		CallDataRecord callDataRecord = run.getBean(CallDataRecord.class);
+		callDataRecord.generateCDR();
 
-    }
+	}
 
 }

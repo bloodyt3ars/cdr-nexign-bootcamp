@@ -20,6 +20,7 @@ public class CallDataRecord {
 
 
     private static int month = 0;//Статическая переменная, отвечающая за месяц в котором генерируются звонки
+    private static int year = 2022;
 
     public CallDataRecord(PhoneNumberRepository phoneNumberRepository, CallRecordRepository callRecordRepository) {
         this.phoneNumberRepository = phoneNumberRepository;
@@ -135,7 +136,8 @@ public class CallDataRecord {
         int minute = random.nextInt(60);//рандомные минуты
         int second = random.nextInt(60);//рандомные секунды
         LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
-        List<CallRecord> callRecords = callRecordRepository.findAllByMonthAndPhoneNumber(CallDataRecord.month, phoneNumber);
+        List<CallRecord> callRecords = callRecordRepository.findAllByMonthAndYearAndPhoneNumber(CallDataRecord.getMonth(),
+                CallDataRecord.getYear(), phoneNumber);
 
         while (true) {//Проверка на то, есть ли уже звонок у этого абонента в это время
             /*Здесь мы используем бесконечный цикл с условием выхода - когда дата/время будет уникальной для данного номера телефона.
@@ -164,12 +166,14 @@ public class CallDataRecord {
 
     private static void monthSetup() {
         /*
-        Инкрементируем переменную месяца, чтобы программой можно было пользоваться не один раз
+        Инкрементируем переменную месяца, чтобы программой можно было пользоваться не один раз в течении одной сессии и
+        было видно историю звонков
         Тарификация производится по месяцам.
         */
         month++;
         if (month > 12) {
             month = month - 12;
+            year++;
         }
     }
 
@@ -178,5 +182,7 @@ public class CallDataRecord {
         return month;
     }
 
-
+    public static int getYear() {
+        return year;
+    }
 }
