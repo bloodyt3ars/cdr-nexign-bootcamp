@@ -29,10 +29,11 @@ public class AbonentDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Abonent user =
                 abonentRepository.findByUsername(username).
-                        orElseThrow(()-> new UsernameNotFoundException("Username not found"));
+                        orElseThrow(() -> new UsernameNotFoundException("Username not found"));
         return new User(user.getUsername(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
     }
-    private Collection<GrantedAuthority> mapRolesToAuthorities(Set<Role> roles){
+
+    private Collection<GrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 }

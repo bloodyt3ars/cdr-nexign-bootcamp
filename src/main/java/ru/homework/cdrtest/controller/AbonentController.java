@@ -11,7 +11,9 @@ import ru.homework.cdrtest.entity.PhoneNumber;
 import ru.homework.cdrtest.repository.AbonentRepository;
 import ru.homework.cdrtest.repository.PhoneNumberRepository;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("abonent")
@@ -33,7 +35,7 @@ public class AbonentController{
     @PatchMapping( "pay")
     public ResponseEntity<Map<String, Object>> pay(@RequestBody PayDto payDto){
         Map<String, Object> responseBody = new LinkedHashMap<>();
-        PhoneNumber phoneNumber = payDto.getNumberPhone();
+        PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(payDto.getNumberPhone());
         int money = payDto.getMoney();
         if (phoneNumber!=null){
             phoneNumber.setBalance(phoneNumber.getBalance()+money);

@@ -140,9 +140,9 @@ public class HighPerfomanceRatingServer {
             звонка умноженной на стоимость минуты звонка (1.0).
              */
             if ((freeMinutes >= 0) && (duration > freeMinutes)) {
-                cost = (duration - freeMinutes) * 1.0;
+                cost = (duration - freeMinutes) * TariffType.UNLIMITED_300.getMinutePrice();
             } else {
-                cost = duration * 1.0;
+                cost = duration * TariffType.UNLIMITED_300.getMinutePrice();
             }
         }
         return cost;
@@ -152,7 +152,7 @@ public class HighPerfomanceRatingServer {
     Метод calculatePerMinuteCost используется для расчета стоимости звонков для тарифа "Поминутный".
      */
     private double calculatePerMinuteCost(int duration) {
-        return duration * 1.5;
+        return duration * TariffType.PER_MINUTE.getMinutePrice();
     }
 
     /*
@@ -165,13 +165,13 @@ public class HighPerfomanceRatingServer {
         Если да, то стоимость звонка равна 0.5 рубля за минуту (цена за минуту в рамках бесплатных минут).
          */
         if ((freeMinutes >= 0) && (duration < freeMinutes)) {
-            cost = duration * 0.5;
+            cost = duration * TariffType.NORMAL.getMinutePrice();
         } else if ((freeMinutes >= 0) && (duration > freeMinutes)) {
             /*
             Если длительность звонка больше, чем количество бесплатных минут, то стоимость считается следующим образом:
             за первые бесплатные минуты плата не взимается, а за оставшееся время стоимость составляет 1.5 рубля за минуту.
              */
-            cost = freeMinutes * 0.5 + (duration - freeMinutes) * 1.5;
+            cost = freeMinutes * TariffType.NORMAL.getMinutePrice() + (duration - freeMinutes) * calculatePerMinuteCost(duration - freeMinutes);
         } else {
             /*
             Если минуты закончились, то считается по тарифу поминутный

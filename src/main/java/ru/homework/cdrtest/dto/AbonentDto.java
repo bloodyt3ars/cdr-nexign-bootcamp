@@ -6,8 +6,8 @@ import ru.homework.cdrtest.entity.PhoneNumber;
 
 @Data
 public class AbonentDto {
-    private Abonent abonent;
-    private PhoneNumber numberPhone;
+    private String username;
+    private String numberPhone;
     private String tariff_id;
     private int balance;
 }
