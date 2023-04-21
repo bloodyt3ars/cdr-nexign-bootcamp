@@ -1,5 +1,7 @@
 package ru.homework.cdrtest.controller;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,8 +37,9 @@ public class AuthController {
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
+
     @PostMapping("login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
+    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(),
                         loginDto.getPassword()));
@@ -46,8 +49,8 @@ public class AuthController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto){
-        if (abonentRepository.existsByUsername(registerDto.getUsername())){
+    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto) {
+        if (abonentRepository.existsByUsername(registerDto.getUsername())) {
             return new ResponseEntity<>("username is already taken", HttpStatus.BAD_REQUEST);
         }
         Abonent abonent = new Abonent();
@@ -60,7 +63,17 @@ public class AuthController {
         abonent.setRoles(Collections.singleton(role));
 
         abonentRepository.save(abonent);
-
         return new ResponseEntity<>("Abonent registered success", HttpStatus.OK);
     }
+
+    @PostMapping("logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        try {
+            request.logout();
+            return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
+        } catch (ServletException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
