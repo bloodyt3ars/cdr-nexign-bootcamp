@@ -17,21 +17,22 @@ public class SecurityConfig {
 
     private final AbonentDetailsService abonentDetailsService;
 
+
     public SecurityConfig(AbonentDetailsService abonentDetailsService) {
         this.abonentDetailsService = abonentDetailsService;
     }
-
 
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .authorizeRequests()
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/abonent/**").permitAll()
-                .requestMatchers("/manager/**").permitAll()
-                .and()
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/abonent/**").hasRole("USER")
+                        .requestMatchers("/manager/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
                 .httpBasic();
         return http.build();
     }

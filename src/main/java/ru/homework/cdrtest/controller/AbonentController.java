@@ -1,25 +1,30 @@
 package ru.homework.cdrtest.controller;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.homework.cdrtest.component.HighPerfomanceRatingServer;
+import ru.homework.cdrtest.entity.Abonent;
 import ru.homework.cdrtest.entity.PhoneNumber;
+import ru.homework.cdrtest.repository.AbonentRepository;
 import ru.homework.cdrtest.repository.PhoneNumberRepository;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("abonent")
-public class AbonentController implements Controller{
+public class AbonentController{
 
-    HighPerfomanceRatingServer highPerfomanceRatingServer;
-    PhoneNumberRepository phoneNumberRepository;
+    private final HighPerfomanceRatingServer highPerfomanceRatingServer;
+    private final PhoneNumberRepository phoneNumberRepository;
+    private final AbonentRepository abonentRepository;
 
-    public AbonentController(HighPerfomanceRatingServer highPerfomanceRatingServer, PhoneNumberRepository phoneNumberRepository) {
+
+    public AbonentController(HighPerfomanceRatingServer highPerfomanceRatingServer,
+                             PhoneNumberRepository phoneNumberRepository,
+                             AbonentRepository abonentRepository) {
         this.highPerfomanceRatingServer = highPerfomanceRatingServer;
         this.phoneNumberRepository = phoneNumberRepository;
+        this.abonentRepository = abonentRepository;
     }
 
     @PatchMapping( "pay")
@@ -43,8 +48,15 @@ public class AbonentController implements Controller{
     @GetMapping("report/{numberPhone}")
     public List<Map> report(@PathVariable("numberPhone")String numberPhone){
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Abonent abonent = abonentRepository.findByUsername(username).orElse(null);
+        List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAllByAbonent(abonent);
         if (phoneNumber!=null){
-            return highPerfomanceRatingServer.calculate(phoneNumber);
+            for (PhoneNumber number : phoneNumbers) {
+                if (number.getPhoneNumber().equals(numberPhone)) {
+                    return highPerfomanceRatingServer.calculate(number);
+                }
+            }
         }
         else {
             List<Map> responseBody = new ArrayList<>();
@@ -53,5 +65,6 @@ public class AbonentController implements Controller{
             responseBody.add(map);
             return responseBody;
         }
+        return null;
     }
 }

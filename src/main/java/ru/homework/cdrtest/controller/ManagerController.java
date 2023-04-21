@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("manager")
-public class ManagerController implements Controller {
+public class ManagerController{
 
 
     PhoneNumberRepository phoneNumberRepository;
