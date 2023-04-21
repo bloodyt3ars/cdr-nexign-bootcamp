@@ -11,17 +11,17 @@ public class PhoneNumberBalanceHistory {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(name = "old_balance")
-    private int oldBalance;
+    private double oldBalance;
 
     @Column(name = "new_balance")
-    private int newBalance;
+    private double newBalance;
     @Column(name = "change_data")
     private Timestamp change_data;
     @ManyToOne
     @JoinColumn(name = "phone_number_id")
     private PhoneNumber phoneNumber;
 
-    public PhoneNumberBalanceHistory(Long id, int oldBalance, int newBalance, Timestamp change_data, PhoneNumber phoneNumber) {
+    public PhoneNumberBalanceHistory(Long id, double oldBalance, double newBalance, Timestamp change_data, PhoneNumber phoneNumber) {
         this.id = id;
         this.oldBalance = oldBalance;
         this.newBalance = newBalance;
@@ -41,19 +41,19 @@ public class PhoneNumberBalanceHistory {
         this.id = id;
     }
 
-    public int getOldBalance() {
+    public double getOldBalance() {
         return oldBalance;
     }
 
-    public void setOldBalance(int oldBalance) {
+    public void setOldBalance(double oldBalance) {
         this.oldBalance = oldBalance;
     }
 
-    public int getNewBalance() {
+    public double getNewBalance() {
         return newBalance;
     }
 
-    public void setNewBalance(int newBalance) {
+    public void setNewBalance(double newBalance) {
         this.newBalance = newBalance;
     }
 
