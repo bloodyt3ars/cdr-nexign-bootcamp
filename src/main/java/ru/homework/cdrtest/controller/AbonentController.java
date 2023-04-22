@@ -1,5 +1,7 @@
 package ru.homework.cdrtest.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,8 +17,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @RestController
 @RequestMapping("abonent")
+@Api(value = "В этом разделе находятся методы взаимодействия абонента с системой", tags = "abonent")
 public class AbonentController {
 
     private final HighPerfomanceRatingServer highPerfomanceRatingServer;
@@ -32,7 +36,10 @@ public class AbonentController {
         this.abonentRepository = abonentRepository;
     }
 
+
     @PatchMapping("pay")
+
+    @ApiOperation(value = "Абонент пополняет свой счет", notes = "Пополнение баланса абонентом")
     public ResponseEntity<Map<String, Object>> pay(@RequestBody PayDto payDto) {
         Map<String, Object> responseBody = new LinkedHashMap<>();
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(payDto.getNumberPhone());
