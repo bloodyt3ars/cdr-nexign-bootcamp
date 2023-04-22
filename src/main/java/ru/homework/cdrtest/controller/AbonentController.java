@@ -17,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("abonent")
-public class AbonentController{
+public class AbonentController {
 
     private final HighPerfomanceRatingServer highPerfomanceRatingServer;
     private final PhoneNumberRepository phoneNumberRepository;
@@ -32,42 +32,42 @@ public class AbonentController{
         this.abonentRepository = abonentRepository;
     }
 
-    @PatchMapping( "pay")
-    public ResponseEntity<Map<String, Object>> pay(@RequestBody PayDto payDto){
+    @PatchMapping("pay")
+    public ResponseEntity<Map<String, Object>> pay(@RequestBody PayDto payDto) {
         Map<String, Object> responseBody = new LinkedHashMap<>();
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(payDto.getNumberPhone());
         int money = payDto.getMoney();
-        if (phoneNumber!=null){
-            phoneNumber.setBalance(phoneNumber.getBalance()+money);
+        if (phoneNumber != null) {
+            phoneNumber.setBalance(phoneNumber.getBalance() + money);
             phoneNumberRepository.save(phoneNumber);
             responseBody.put("id", phoneNumber.getId());
             responseBody.put("numberPhone", phoneNumber.getPhoneNumber());
             responseBody.put("money", phoneNumber.getBalance());
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
-        }
-        else {
+        } else {
             responseBody.put("exception", "phone number not found");
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
     }
+
     @GetMapping("report/{numberPhone}")
-    public ResponseEntity<?> report(@PathVariable("numberPhone")PhoneNumber numberPhone){
+    public ResponseEntity<?> report(@PathVariable("numberPhone") String numberPhone) {
+        PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
+        if (phoneNumber == null) {
+            return new ResponseEntity<>("exception, phone number not found", HttpStatus.BAD_REQUEST);
+        }
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Abonent abonent = abonentRepository.findByUsername(username).orElse(null);
         List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAllByAbonent(abonent);
-        if (abonent==null){//Тестовая логика
-            return new ResponseEntity<>(highPerfomanceRatingServer.calculate(numberPhone), HttpStatus.UNAUTHORIZED);
+        if ((abonent != null)&&(phoneNumber.getAbonent()==null)) {//Тестовая логика
+            return new ResponseEntity<>(highPerfomanceRatingServer.calculate(phoneNumber), HttpStatus.UNAUTHORIZED);
         }
-        if (numberPhone!=null){
-            for (PhoneNumber number : phoneNumbers) {
-                if (number.getPhoneNumber().equals(numberPhone.getPhoneNumber())) {
-                    return new ResponseEntity<>(highPerfomanceRatingServer.calculate(number), HttpStatus.OK);
-                }
+        for (PhoneNumber number : phoneNumbers) {
+            if (number.getPhoneNumber().equals(numberPhone)) {
+                return new ResponseEntity<>(highPerfomanceRatingServer.calculate(number), HttpStatus.OK);
             }
         }
-        else {
-            return new ResponseEntity<>("exception, phone number not found", HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>("something going wrong", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Something going wrong. Perhaps you do not have access to this phone number", HttpStatus.BAD_REQUEST);
     }
+
 }

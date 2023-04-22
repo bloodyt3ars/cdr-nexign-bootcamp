@@ -3,7 +3,7 @@ create table role
     id bigserial constraint role_pk primary key,
     name varchar(25) not null constraint role_name_unique unique
 );
-INSERT INTO role (name) VALUES ('USER'), ('ADMIN');
+INSERT INTO role (name) VALUES ('ROLE_USER'), ('ROLE_ADMIN');
 
 
 create table call_type
