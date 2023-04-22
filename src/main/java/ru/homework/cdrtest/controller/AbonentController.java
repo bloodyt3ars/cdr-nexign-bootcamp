@@ -38,7 +38,6 @@ public class AbonentController {
 
 
     @PatchMapping("pay")
-
     @ApiOperation(value = "Абонент пополняет свой счет", notes = "Пополнение баланса абонентом")
     public ResponseEntity<Map<String, Object>> pay(@RequestBody PayDto payDto) {
         Map<String, Object> responseBody = new LinkedHashMap<>();
@@ -58,6 +57,7 @@ public class AbonentController {
     }
 
     @GetMapping("report/{numberPhone}")
+    @ApiOperation(value = "Абонент получает детализацию звонков за последний месяц", notes = "Получение отчета")
     public ResponseEntity<?> report(@PathVariable("numberPhone") String numberPhone) {
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
         if (phoneNumber == null) {

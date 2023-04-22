@@ -23,8 +23,9 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/abonent/**").hasRole("USER")/*.permitAll()*/
-                        .requestMatchers("/manager/**").hasRole("ADMIN")/*.permitAll()*/
+                        .requestMatchers("/swagger-ui/").permitAll()
+                        .requestMatchers("/abonent/**").hasRole("USER")
+                        .requestMatchers("/manager/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .httpBasic().and().formLogin().disable();
