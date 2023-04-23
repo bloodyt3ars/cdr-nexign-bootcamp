@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import ru.homework.cdrtest.component.HighPerfomanceRatingServer;
+import ru.homework.cdrtest.component.HighPerformanceRatingServer;
 import ru.homework.cdrtest.dto.PayDto;
 import ru.homework.cdrtest.entity.Abonent;
 import ru.homework.cdrtest.entity.PhoneNumber;
@@ -20,12 +20,12 @@ import java.util.Map;
 @RequestMapping("abonent")
 public class AbonentController {
 
-    private final HighPerfomanceRatingServer highPerfomanceRatingServer;
+    private final HighPerformanceRatingServer highPerfomanceRatingServer;
     private final PhoneNumberRepository phoneNumberRepository;
     private final AbonentRepository abonentRepository;
 
 
-    public AbonentController(HighPerfomanceRatingServer highPerfomanceRatingServer,
+    public AbonentController(HighPerformanceRatingServer highPerfomanceRatingServer,
                              PhoneNumberRepository phoneNumberRepository,
                              AbonentRepository abonentRepository) {
         this.highPerfomanceRatingServer = highPerfomanceRatingServer;

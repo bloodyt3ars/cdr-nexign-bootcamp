@@ -1,6 +1,7 @@
 package ru.homework.cdrtest.component;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.VisibleForTesting;
 import org.springframework.stereotype.Component;
 import ru.homework.cdrtest.entity.CallRecord;
 import ru.homework.cdrtest.entity.CallType;
@@ -14,25 +15,30 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
-public class HighPerfomanceRatingServer {
+public class HighPerformanceRatingServer {
 
-    private final CallRecordRepository callRecordRepository;
+    private CallRecordRepository callRecordRepository;
 
-    public HighPerfomanceRatingServer(CallRecordRepository callRecordRepository) {
+    public HighPerformanceRatingServer() {
+    }
+
+    public HighPerformanceRatingServer(CallRecordRepository callRecordRepository) {
         this.callRecordRepository = callRecordRepository;
     }
 
-/*  Этот метод принимает объект PhoneNumber, извлекает необходимую информацию об этом номере телефона (id, номер телефона и тариф),
-    а затем использует эту информацию, чтобы рассчитать стоимость звонков, сделанных в течение месяца для этого номера телефона.
-    Метод создает новый LinkedHashMap, который содержит поля id, numberPhone, tariff, payload, totalCost и monetaryUnit.
-    Поле payload является списком LinkedHashMap, каждый из которых содержит информацию о каждом звонке,
-    сделанном в течение месяца для данного номера телефона.
-    Метод проходит по всем записям звонков из репозитория callRecordRepository за указанный месяц и номером телефона,
-    извлекает данные о звонке (тип звонка, дату начала и конца звонка, продолжительность и стоимость),
-    рассчитывает стоимость звонка в зависимости от тарифа и добавляет информацию о звонке в список payload.
-    Наконец, метод рассчитывает общую стоимость всех звонков и добавляет ее в LinkedHashMap в поле totalCost.
-    Метод также добавляет в LinkedHashMap единицу валюты "rubles" в поле monetaryUnit и возвращает список,
-    содержащий этот LinkedHashMap.*/
+
+
+    /*  Этот метод принимает объект PhoneNumber, извлекает необходимую информацию об этом номере телефона (id, номер телефона и тариф),
+        а затем использует эту информацию, чтобы рассчитать стоимость звонков, сделанных в течение месяца для этого номера телефона.
+        Метод создает новый LinkedHashMap, который содержит поля id, numberPhone, tariff, payload, totalCost и monetaryUnit.
+        Поле payload является списком LinkedHashMap, каждый из которых содержит информацию о каждом звонке,
+        сделанном в течение месяца для данного номера телефона.
+        Метод проходит по всем записям звонков из репозитория callRecordRepository за указанный месяц и номером телефона,
+        извлекает данные о звонке (тип звонка, дату начала и конца звонка, продолжительность и стоимость),
+        рассчитывает стоимость звонка в зависимости от тарифа и добавляет информацию о звонке в список payload.
+        Наконец, метод рассчитывает общую стоимость всех звонков и добавляет ее в LinkedHashMap в поле totalCost.
+        Метод также добавляет в LinkedHashMap единицу валюты "rubles" в поле monetaryUnit и возвращает список,
+        содержащий этот LinkedHashMap.*/
     public List<Map> calculate(@NotNull PhoneNumber phoneNumber) {
         // Создаем объект для хранения результата
         Map<String, Object> responseBody = new LinkedHashMap<>();
@@ -122,6 +128,7 @@ public class HighPerfomanceRatingServer {
     /*
     Метод calculateUnlimited300Cost используется для расчета стоимости звонков для тарифа "Безлимит 300".
      */
+
     private double calculateUnlimited300Cost(int freeMinutes, int duration) {
         double cost;
         /*
@@ -171,12 +178,12 @@ public class HighPerfomanceRatingServer {
             Если длительность звонка больше, чем количество бесплатных минут, то стоимость считается следующим образом:
             за первые бесплатные минуты плата не взимается, а за оставшееся время стоимость составляет 1.5 рубля за минуту.
              */
-            cost = freeMinutes * TariffType.NORMAL.getMinutePrice() + (duration - freeMinutes) * calculatePerMinuteCost(duration - freeMinutes);
+            cost = freeMinutes * TariffType.NORMAL.getMinutePrice() + calculatePerMinuteCost(duration - freeMinutes);
         } else {
             /*
             Если минуты закончились, то считается по тарифу поминутный
              */
-            cost = duration * calculatePerMinuteCost(duration);
+            cost = calculatePerMinuteCost(duration);
         }
         return cost;
     }

@@ -11,11 +11,11 @@ import java.util.*;
 public class BillingRealTime {
     PhoneNumberRepository phoneNumberRepository;
     CallRecordRepository callRecordRepository;
-    HighPerfomanceRatingServer highPerfomanceRatingServer;
+    HighPerformanceRatingServer highPerfomanceRatingServer;
     CallDataRecord callDataRecord;
 
     public BillingRealTime(PhoneNumberRepository phoneNumberRepository, CallRecordRepository callRecordRepository,
-                           HighPerfomanceRatingServer highPerfomanceRatingServer, CallDataRecord callDataRecord) {
+                           HighPerformanceRatingServer highPerfomanceRatingServer, CallDataRecord callDataRecord) {
         this.phoneNumberRepository = phoneNumberRepository;
         this.callRecordRepository = callRecordRepository;
         this.highPerfomanceRatingServer = highPerfomanceRatingServer;
