@@ -91,3 +91,10 @@ CREATE TRIGGER tr_update_phone_number_balance_history
     FOR EACH ROW
 EXECUTE FUNCTION update_phone_number_balance_history();
 
+INSERT INTO abonent (id, first_name, last_name, username, password)
+VALUES (1, 'Abonent','Test','user','$2a$10$xKgEuO4TcHw6ctRoWj/2E.ruaTXFcm7gFaAJeNdVwkLhPkbD8NAQ2'),
+    (2, 'Manager','Test','admin','$2a$10$3MTpcAY4PG9DXdrOZmQU5uH07ohO7hypdjWiDE4e9zLC0RcRiVBi6');
+
+INSERT INTO user_roles (abonent_id, role_id) VALUES (1,1), (2,2);
+
+

@@ -55,8 +55,8 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(schema = @Schema(type = "Abonent signed success"))),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content())})
     public ResponseEntity<String> login(@RequestBody
-                                            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "В теле запроса обязательно должен быть логин и пароль")
-                                            LoginDto loginDto) {
+                                        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "В теле запроса обязательно должен быть логин и пароль")
+                                        LoginDto loginDto) {
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(),
                         loginDto.getPassword()));
@@ -74,8 +74,8 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "username is already taken", content = @Content()),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content())})
     public ResponseEntity<String> register(@RequestBody
-                                               @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "В теле запроса обязательно должно быть имя, фамилия, логин и пароль")
-                                               RegisterDto registerDto) {
+                                           @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "В теле запроса обязательно должно быть имя, фамилия, логин и пароль")
+                                           RegisterDto registerDto) {
         if (abonentRepository.existsByUsername(registerDto.getUsername())) {
             return new ResponseEntity<>("username is already taken", HttpStatus.BAD_REQUEST);
         }
@@ -85,7 +85,7 @@ public class AuthController {
         abonent.setUsername(registerDto.getUsername());
         abonent.setPassword(passwordEncoder.encode((registerDto.getPassword())));
 
-        Role role = roleRepository.findByName("USER").get();
+        Role role = roleRepository.findByName("ROLE_USER").get();
         abonent.setRoles(Collections.singleton(role));
 
         abonentRepository.save(abonent);
