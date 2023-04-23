@@ -1,5 +1,11 @@
 package ru.homework.cdrtest.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +17,7 @@ import ru.homework.cdrtest.entity.Abonent;
 import ru.homework.cdrtest.entity.PhoneNumber;
 import ru.homework.cdrtest.repository.AbonentRepository;
 import ru.homework.cdrtest.repository.PhoneNumberRepository;
+import ru.homework.cdrtest.swagger.ReportResponse;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,9 +42,19 @@ public class AbonentController {
         this.abonentRepository = abonentRepository;
     }
 
-
+    @Operation(
+            summary = "Пополнение баланса абонентом",
+            description = "Абонент пополняет свой счет",
+            operationId = "abonentPay"
+    )
     @PatchMapping("pay")
-    public ResponseEntity<Map<String, Object>> pay(@RequestBody PayDto payDto) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(schema = @Schema(implementation = PayDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Phone number not found")})
+    public ResponseEntity<Map<String, Object>> pay(@RequestBody
+                                                       @Parameter(description = "В теле запроса обязательно должен быть номер абонента и сумма, на которую абонент планирует пополнить баланс")
+                                                       PayDto payDto) {
         Map<String, Object> responseBody = new LinkedHashMap<>();
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(payDto.getNumberPhone());
         int money = payDto.getMoney();
@@ -54,8 +71,20 @@ public class AbonentController {
         }
     }
 
+    @Operation(
+            summary = "Получение отчета",
+            description = "Абонент получает отчет по своему номеру телефона за прошедший месяц",
+            operationId = "abonentReport"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(schema = @Schema(implementation = ReportResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "400", description = "Something going wrong. Perhaps you do not have access to this phone number"),
+            @ApiResponse(responseCode = "400", description = "Phone number not found")})
     @GetMapping("report/{numberPhone}")
-    public ResponseEntity<?> report(@PathVariable("numberPhone") String numberPhone) {
+    public ResponseEntity<?> report(@PathVariable("numberPhone")
+            @Parameter(description = "Номер телефона")
+                                        String numberPhone) {
         PhoneNumber phoneNumber = phoneNumberRepository.findPhoneNumberByPhoneNumber(numberPhone);
         if (phoneNumber == null) {
             return new ResponseEntity<>("exception, phone number not found", HttpStatus.BAD_REQUEST);

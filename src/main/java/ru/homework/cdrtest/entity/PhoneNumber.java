@@ -1,9 +1,11 @@
 package ru.homework.cdrtest.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "phone_number")
+@Schema(description = "")
 public class PhoneNumber {
 
     @Id

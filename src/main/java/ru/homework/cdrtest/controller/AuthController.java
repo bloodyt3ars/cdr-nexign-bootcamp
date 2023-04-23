@@ -1,5 +1,11 @@
 package ru.homework.cdrtest.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.homework.cdrtest.dto.LoginDto;
+import ru.homework.cdrtest.dto.PayDto;
 import ru.homework.cdrtest.dto.RegisterDto;
 import ru.homework.cdrtest.entity.Abonent;
 import ru.homework.cdrtest.entity.Role;
@@ -41,7 +48,15 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+    @Operation(summary = "Авторизация пользователя",
+            description = "Позволяет авторизоваться пользователю",
+            operationId = "authLogin")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(schema = @Schema(type = "Abonent signed success"))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content())})
+    public ResponseEntity<String> login(@RequestBody
+                                            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "В теле запроса обязательно должен быть логин и пароль")
+                                            LoginDto loginDto) {
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(),
                         loginDto.getPassword()));
@@ -51,7 +66,16 @@ public class AuthController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto) {
+    @Operation(summary = "Регистрация пользователя",
+            description = "Позволяет зарегистрировать пользователя",
+            operationId = "authRegister")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(schema = @Schema(type = "Abonent registered success"))),
+            @ApiResponse(responseCode = "400", description = "username is already taken", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content())})
+    public ResponseEntity<String> register(@RequestBody
+                                               @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "В теле запроса обязательно должно быть имя, фамилия, логин и пароль")
+                                               RegisterDto registerDto) {
         if (abonentRepository.existsByUsername(registerDto.getUsername())) {
             return new ResponseEntity<>("username is already taken", HttpStatus.BAD_REQUEST);
         }
@@ -69,6 +93,12 @@ public class AuthController {
     }
 
     @PostMapping("logout")
+    @Operation(summary = "Выход пользователя из системы",
+            description = "Позволяет пользователю разлогиниться",
+            operationId = "authLogout")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(schema = @Schema(type = "Logged out successfully"))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content())})
     public ResponseEntity<String> logout(HttpServletRequest request) {
         try {
             request.logout();

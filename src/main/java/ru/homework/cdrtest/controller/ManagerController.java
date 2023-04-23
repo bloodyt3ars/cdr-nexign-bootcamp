@@ -1,5 +1,11 @@
 package ru.homework.cdrtest.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,12 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import ru.homework.cdrtest.component.BillingRealTime;
 import ru.homework.cdrtest.dto.AbonentDto;
 import ru.homework.cdrtest.dto.BillingDto;
+import ru.homework.cdrtest.dto.PayDto;
 import ru.homework.cdrtest.dto.TariffDto;
 import ru.homework.cdrtest.entity.Abonent;
 import ru.homework.cdrtest.entity.PhoneNumber;
 import ru.homework.cdrtest.entity.TariffType;
 import ru.homework.cdrtest.repository.AbonentRepository;
 import ru.homework.cdrtest.repository.PhoneNumberRepository;
+import ru.homework.cdrtest.swagger.BillingResponse;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -34,8 +42,16 @@ public class ManagerController {
     }
 
 
-    @PatchMapping("chaneTariff")
-    public ResponseEntity<?> changeTariff(@RequestBody TariffDto tariffDto) {
+    @PatchMapping("changeTariff")
+    @Operation(summary = "Менеджер изменяет тариф абонента",
+            description = "Менеджер изменяет тариф абонента",
+            operationId = "managerChangeTariff")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(schema = @Schema(implementation = TariffDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content())})
+    public ResponseEntity<?> changeTariff(@RequestBody
+                                              @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "В теле запроса обязательно должен быть номер телефона и тариф")
+                                              TariffDto tariffDto) {
         String numberPhone = tariffDto.getNumberPhone();
         String tariffId = tariffDto.getTariff_id();
         TariffType tariffType = TariffType.getTariffTypeByTariffId(tariffId);
@@ -58,7 +74,15 @@ public class ManagerController {
 
 
     @PostMapping("abonent")
-    public ResponseEntity<?> createNewAbonent(@RequestBody AbonentDto abonentDto) {
+    @Operation(summary = "Менеджер создаёт нового абонента",
+            description = "Менеджер создаёт нового абонента",
+            operationId = "managerAbonent")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(schema = @Schema(implementation = AbonentDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content())})
+    public ResponseEntity<?> createNewAbonent(@RequestBody
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "В теле запроса обязательно должен быть логин абонента, его номер, тариф и сумма, на которую абонент планирует пополнить баланс")
+                                                  AbonentDto abonentDto) {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         String username = abonentDto.getUsername();
@@ -94,7 +118,15 @@ public class ManagerController {
     }
 
     @PatchMapping("billing")
-    public ResponseEntity<?> billing(@RequestBody BillingDto billingDto) {
+    @Operation(summary = "Менеджер проводит тарификацию",
+            description = "Менеджер проводит тарификацию",
+            operationId = "managerBilling")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(schema = @Schema(implementation = BillingResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content())})
+    public ResponseEntity<?> billing(@RequestBody
+                                         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "В теле запроса должен быть action")
+                                         BillingDto billingDto) {
         if (!billingDto.getAction().equals("run")) {
             return new ResponseEntity<>("unknown action", HttpStatus.BAD_REQUEST);
         }
