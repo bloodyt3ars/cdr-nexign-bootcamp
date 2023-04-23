@@ -1,5 +1,6 @@
 package ru.homework.cdrtest.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import java.util.Collections;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "auth", description = "В этом разделе находятся методы авторизации и идентификации пользователя")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final AbonentRepository abonentRepository;

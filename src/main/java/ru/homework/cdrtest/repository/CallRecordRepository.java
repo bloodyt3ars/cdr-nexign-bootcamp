@@ -1,5 +1,6 @@
 package ru.homework.cdrtest.repository;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,6 +11,7 @@ import ru.homework.cdrtest.entity.PhoneNumber;
 import java.util.List;
 
 @Repository
+@Hidden
 public interface CallRecordRepository extends JpaRepository<CallRecord, Long> {
 
     //возвращает список записей звонков для заданного телефонного номера.

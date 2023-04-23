@@ -1,5 +1,6 @@
 package ru.homework.cdrtest.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("abonent")
+@Tag(name="abonent", description="В этом разделе находятся методы взаимодействия абонента с системой")
 public class AbonentController {
 
     private final HighPerformanceRatingServer highPerfomanceRatingServer;
