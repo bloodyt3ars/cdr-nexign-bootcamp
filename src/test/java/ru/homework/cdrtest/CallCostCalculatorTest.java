@@ -1,7 +1,9 @@
 package ru.homework.cdrtest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.Test;
 import ru.homework.cdrtest.component.HighPerformanceRatingServer;
+import ru.homework.cdrtest.repository.CallRecordRepository;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -9,9 +11,12 @@ import java.lang.reflect.Method;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CallCostCalculatorTest {
+
+    @Autowired
+    CallRecordRepository callRecordRepository;
     @Test
     public void testCalculateUnlimited300CostWithFreeMinutes() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer();
+        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer(callRecordRepository);
         int freeMinutes = 10;
         int duration = 5;
         double expectedCost = 0;
@@ -23,7 +28,7 @@ public class CallCostCalculatorTest {
     }
     @Test
     public void testCalculateUnlimited300CostWithExtraMinutes() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer();
+        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer(callRecordRepository);
         int freeMinutes = 10;
         int duration = 20;
         double expectedCost = 10;
@@ -36,7 +41,7 @@ public class CallCostCalculatorTest {
 
     @Test
     public void testCalculateUnlimited300CostWithoutFreeMinutes() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer();
+        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer(callRecordRepository);
         int freeMinutes = 0;
         int duration = 20;
         double expectedCost = 20;
@@ -49,7 +54,7 @@ public class CallCostCalculatorTest {
 
     @Test
     public void testCalculatePerMinuteCost() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer();
+        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer(callRecordRepository);
         int duration = 30;
         double expectedCost = 30 * 1.5;
         Method method = HighPerformanceRatingServer.class.getDeclaredMethod(
@@ -61,7 +66,7 @@ public class CallCostCalculatorTest {
 
     @Test
     public void testCalculateNormalCostWithFreeMinutes() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer();
+        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer(callRecordRepository);
         int freeMinutes = 10;
         int duration = 5;
         double expectedCost = 5*0.5;
@@ -74,7 +79,7 @@ public class CallCostCalculatorTest {
 
     @Test
     public void testCalculateNormalCostWithExtraMinutes() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer();
+        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer(callRecordRepository);
         int freeMinutes = 10;
         int duration = 30;
         double expectedCost = 10*0.5+20*1.5;
@@ -87,7 +92,7 @@ public class CallCostCalculatorTest {
 
     @Test
     public void testCalculateNormalCostWithoutFreeMinutes() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer();
+        HighPerformanceRatingServer calculator = new HighPerformanceRatingServer(callRecordRepository);
         int freeMinutes = 0;
         int duration = 30;
         double expectedCost = 30 * 1.5;

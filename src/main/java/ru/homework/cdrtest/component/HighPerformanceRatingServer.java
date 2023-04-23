@@ -17,10 +17,7 @@ import java.util.*;
 @Component
 public class HighPerformanceRatingServer {
 
-    private CallRecordRepository callRecordRepository;
-
-    public HighPerformanceRatingServer() {
-    }
+    private final CallRecordRepository callRecordRepository;
 
     public HighPerformanceRatingServer(CallRecordRepository callRecordRepository) {
         this.callRecordRepository = callRecordRepository;
