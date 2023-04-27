@@ -1,7 +1,6 @@
 package ru.homework.cdrtest.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.homework.cdrtest.dto.LoginDto;
-import ru.homework.cdrtest.dto.PayDto;
 import ru.homework.cdrtest.dto.RegisterDto;
 import ru.homework.cdrtest.entity.Abonent;
 import ru.homework.cdrtest.entity.Role;

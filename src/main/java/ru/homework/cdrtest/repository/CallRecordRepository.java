@@ -33,6 +33,10 @@ public interface CallRecordRepository extends JpaRepository<CallRecord, Long> {
                                                          @Param("year") int year,
                                                          @Param("phoneNumber") PhoneNumber phoneNumber);
 
-    //возвращает список записей звонков для заданного телефонного номера.
-    /*List<CallRecord> findAllByReceivingPhoneNumber(PhoneNumber phoneNumber);*/
+    @Query("SELECT month(callStart) from CallRecord group by month(callStart), year(callStart) order by year(callStart) desc,month(callStart) desc limit 1")
+    int getMonth();
+
+    @Query("SELECT year(callStart) from CallRecord group by year(callStart) order by year(callStart) desc limit 1")
+    int getYear();
+
 }

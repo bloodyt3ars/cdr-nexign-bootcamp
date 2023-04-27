@@ -8,6 +8,7 @@ import ru.homework.cdrtest.repository.CallRecordRepository;
 import ru.homework.cdrtest.repository.PhoneNumberRepository;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.Random;
 @Component
 public class CallDataRecord {
     private final PhoneNumberRepository phoneNumberRepository;
-    private final CallRecordRepository callRecordRepository;
+    private static CallRecordRepository callRecordRepository;
 
 
     private static int month = 0;//Статическая переменная, отвечающая за месяц в котором генерируются звонки
@@ -30,66 +31,6 @@ public class CallDataRecord {
     /*
     Генерация CDR.
     */
-
-    /*public void generateCDR() {
-        monthSetup();
-        List<CallRecord> callRecords = new ArrayList<>();
-        List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAllByBalanceGreaterThan(0);
-        for (PhoneNumber phoneNumber : phoneNumbers) {
-            List<CallRecord> outgoingCalls = callRecordRepository.findAllByPhoneNumber(phoneNumber);
-            List<CallRecord> incomingCalls = callRecordRepository.findAllByReceivingPhoneNumber(phoneNumber);
-            for (PhoneNumber receivingPhoneNumber : phoneNumbers) {
-                if (receivingPhoneNumber.equals(phoneNumber))
-                    continue;
-                List<CallRecord> incomingCallsToThisNumber = callRecordRepository.findAllByReceivingPhoneNumber(receivingPhoneNumber);
-                List<CallRecord> outgoingCallsToThisNumber = callRecordRepository.findAllByPhoneNumber(receivingPhoneNumber);
-                for (int i = 0; i < outgoingCalls.size(); i++) {
-                    CallRecord outgoingCall = outgoingCalls.get(i);
-                    if (outgoingCall.getCallType() == CallType.OUTGOING && outgoingCall.getReceivingPhoneNumber() == null) {
-                        LocalDateTime outgoingCallStart = outgoingCall.getCallStart();
-                        LocalDateTime outgoingCallEnd = outgoingCall.getCallEnd();
-                        boolean isValid = true;
-                        for (int j = 0; j < incomingCalls.size(); j++) {
-                            CallRecord incomingCall = incomingCalls.get(j);
-                            if (incomingCall.getCallStart().isBefore(outgoingCallEnd) && incomingCall.getCallEnd().isAfter(outgoingCallStart)) {
-                                isValid = false;
-                                break;
-                            }
-                        }
-                        for (int j = 0; j < incomingCallsToThisNumber.size(); j++) {
-                            CallRecord incomingCall = incomingCallsToThisNumber.get(j);
-                            if (incomingCall.getCallStart().isBefore(outgoingCallEnd) && incomingCall.getCallEnd().isAfter(outgoingCallStart)) {
-                                isValid = false;
-                                break;
-                            }
-                        }
-                        for (int j = 0; j < outgoingCallsToThisNumber.size(); j++) {
-                            CallRecord outgoingCallToThisNumber = outgoingCallsToThisNumber.get(j);
-                            if (outgoingCallToThisNumber.getCallStart().isBefore(outgoingCallEnd) && outgoingCallToThisNumber.getCallEnd().isAfter(outgoingCallStart)) {
-                                isValid = false;
-                                break;
-                            }
-                        }
-                        if (isValid) {
-                            CallRecord incomingCall = new CallRecord();
-                            incomingCall.setPhoneNumber(outgoingCall.getReceivingPhoneNumber());
-                            incomingCall.setReceivingPhoneNumber(outgoingCall.getPhoneNumber());
-                            incomingCall.setCallType(CallType.INCOMING);
-                            incomingCall.setCallStart(outgoingCallStart.plusSeconds(1));
-                            LocalDateTime incomingCallEnd = outgoingCallEnd.plusSeconds(1);
-                            incomingCall.setCallEnd(incomingCallEnd);
-                            outgoingCall.setReceivingPhoneNumber(receivingPhoneNumber);
-                            outgoingCall.setCallEnd(outgoingCallEnd.plusSeconds(1));
-                            callRecords.add(incomingCall);
-                            callRecords.add(outgoingCall);
-                            callRecordRepository.save(incomingCall);
-                            callRecordRepository.save(outgoingCall);
-                        }
-                    }
-                }
-            }
-        }
-    }*/
     public void generateCDR() {
         monthSetup();// Изменение статической переменной месяца на +1.
         List<CallRecord> callRecords = new ArrayList<>();//Создается ArrayList звонков
@@ -101,8 +42,8 @@ public class CallDataRecord {
             for (int i = 0; i < n; i++) {
                 CallRecord callRecord = new CallRecord();//Создается запись
                 CallType callType = getRandomCallType(); //Рандомно определяется входящий или исходящий звонок.
-                LocalDateTime startTime = getRandomDateTime(phoneNumber); // Рандомное начало
-                LocalDateTime endTime = startTime.plusSeconds(getRandomDuration()); //К началу прибавляется рандомное кол-во секунд. От 1 секунды до 60 минут.
+                LocalDateTime startTime = formatDateTime(getRandomDateTime(phoneNumber)); // Рандомное начало
+                LocalDateTime endTime = formatDateTime(startTime.plusSeconds(getRandomDuration())); //К началу прибавляется рандомное кол-во секунд. От 1 секунды до 60 минут.
                 callRecord.setPhoneNumber(phoneNumber); // Присваивается номер телефона
                 callRecord.setCallType(callType); // Присваивается тип звонка
                 callRecord.setCallStart(startTime);// Присвоение даты начала
@@ -110,7 +51,6 @@ public class CallDataRecord {
                 callRecords.add(callRecord);//Добавление в ArrayList
             }
         }
-
         Collections.sort(callRecords); //Сортировка записей, чтобы они были в порядке совершения звонка
         callRecordRepository.saveAll(callRecords);// сохранение всех записей в бд
     }
@@ -129,7 +69,7 @@ public class CallDataRecord {
 
     private LocalDateTime getRandomDateTime(PhoneNumber phoneNumber) {
         Random random = new Random();
-        int year = 2022;
+        int year = CallDataRecord.year;
         int month = CallDataRecord.month; //Месяц из статической переменной
         int day = random.nextInt(28) + 1; //Рандомный день
         int hour = random.nextInt(24);//Рандомные часы
@@ -170,19 +110,33 @@ public class CallDataRecord {
         было видно историю звонков
         Тарификация производится по месяцам.
         */
+        init();
         month++;
         if (month > 12) {
             month = month - 12;
             year++;
         }
     }
+    private static void init(){
+        if (month == 0) {
+            month = callRecordRepository.getMonth();
+            year = callRecordRepository.getYear();
+        }
+    }
 
     public static int getMonth() {
-        //Статический метод, который отдает какой сейчас месяц.
+        init();
         return month;
     }
 
     public static int getYear() {
+        init();
         return year;
+    }
+
+    private static LocalDateTime formatDateTime(LocalDateTime dt) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = dt.format(formatter);
+        return LocalDateTime.parse(formattedDateTime, formatter);
     }
 }

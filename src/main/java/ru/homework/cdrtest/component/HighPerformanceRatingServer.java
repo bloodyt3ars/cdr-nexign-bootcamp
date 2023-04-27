@@ -186,7 +186,7 @@ public class HighPerformanceRatingServer {
     }
 
     private static String formatDateTime(LocalDateTime dt) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss0");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return dt.format(formatter);
     }
 }

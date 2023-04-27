@@ -14,7 +14,7 @@ public class CdrTestApplication {
 
     public static void main(String[] args) {
 
-		ConfigurableApplicationContext run = SpringApplication.run(CdrTestApplication.class, args);
+		/*ConfigurableApplicationContext run = SpringApplication.run(CdrTestApplication.class, args);
 
 		CallRecordRepository callRecordRepository = run.getBean(CallRecordRepository.class);
 		PhoneNumberBalanceHistoryRepository phoneNumberBalanceHistoryRepository = run.getBean(PhoneNumberBalanceHistoryRepository.class);
@@ -27,7 +27,9 @@ public class CdrTestApplication {
 		GeneratePhoneNumbers generatePhoneNumbers = run.getBean(GeneratePhoneNumbers.class);
 		generatePhoneNumbers.generate(10);
 		CallDataRecord callDataRecord = run.getBean(CallDataRecord.class);
-		callDataRecord.generateCDR();
+		callDataRecord.generateCDR();*/
+
+		SpringApplication.run(CdrTestApplication.class, args);
 
 	}
 
