@@ -20,7 +20,7 @@ INSERT INTO user_roles (abonent_id, role_id)
 VALUES (1, 1),
        (2, 2);
 
-INSERT INTO phone_number (id, balance, phone_number, tariff_type_id, abonent_id)
+INSERT INTO phone_number (id, balance, free_minute, phone_number, tariff_type_id, abonent_id)
 values (1, 66.12, 0, '79433801925', 2, 1),
        (2, 11.4, 0, '79413261926', 1, 1),
        (3, 782.77, 0, '79919911523', 2, 1),

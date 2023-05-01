@@ -31,7 +31,7 @@ public class GeneratePhoneNumbers {
             //Генерируется случайный телефонный номер с помощью метода generatePhoneNumber().
             String generatePhoneNumber = generatePhoneNumber();
             //Генерируется случайный баланс с помощью класса Random.
-            double balance = Math.ceil(random.nextDouble(1000) * 100) / 100;
+            double balance = Math.ceil(random.nextDouble() * 1000.0 * 100) / 100;
             //Получается абонент с помощью метода findById() из репозитория abonentRepository с заданным идентификатором "abonent_id".
             long abonent_id = 1;
             Abonent byId = abonentRepository.findById(abonent_id).orElse(null);
