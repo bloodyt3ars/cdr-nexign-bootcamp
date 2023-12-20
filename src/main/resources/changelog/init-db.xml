@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1703081985056-1" author="vantonov">
+        <createSequence incrementBy="50" sequenceName="abonent_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1703081985056-2" author="vantonov">
+        <createSequence incrementBy="50" sequenceName="call_record_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1703081985056-3" author="vantonov">
+        <createSequence incrementBy="50" sequenceName="role_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1703081985056-4" author="vantonov">
+        <createSequence incrementBy="50" sequenceName="tariff_type_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1703081985056-5" author="vantonov">
+        <createTable tableName="abonent">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_abonent"/>
+            </column>
+            <column name="phone_number" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="balance" type="DOUBLE"/>
+            <column name="tariff_type_id" type="BIGINT"/>
+            <column name="free_minutes" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1703081985056-6" author="vantonov">
+        <createTable tableName="call_record">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_call_record"/>
+            </column>
+            <column name="abonent_id" type="BIGINT"/>
+            <column name="call_type_code" type="VARCHAR(255)"/>
+            <column name="call_start" type="DATETIME"/>
+            <column name="call_end" type="DATETIME"/>
+            <column name="call_duration" type="BIGINT"/>
+            <column name="call_cost" type="DOUBLE"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1703081985056-7" author="vantonov">
+        <createTable tableName="role">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_role"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="sys_name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1703081985056-8" author="vantonov">
+        <createTable tableName="tariff_type">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tariff_type"/>
+            </column>
+            <column name="code" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="price_per_min" type="DOUBLE"/>
+            <column name="free_minutes" type="BIGINT"/>
+            <column name="fixed_price" type="DOUBLE"/>
+            <column name="tariff_type" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1703081985056-9" author="vantonov">
+        <createTable tableName="user_roles">
+            <column name="abonent_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user_roles"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user_roles"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1703081985056-10" author="vantonov">
+        <addForeignKeyConstraint baseColumnNames="tariff_type_id" baseTableName="abonent"
+                                 constraintName="FK_ABONENT_ON_TARIFF_TYPE" referencedColumnNames="id"
+                                 referencedTableName="tariff_type"/>
+    </changeSet>
+    <changeSet id="1703081985056-11" author="vantonov">
+        <addForeignKeyConstraint baseColumnNames="abonent_id" baseTableName="call_record"
+                                 constraintName="FK_CALL_RECORD_ON_ABONENT" referencedColumnNames="id"
+                                 referencedTableName="abonent"/>
+    </changeSet>
+    <changeSet id="1703081985056-12" author="vantonov">
+        <addForeignKeyConstraint baseColumnNames="abonent_id" baseTableName="user_roles"
+                                 constraintName="fk_userol_on_abonent_entity" referencedColumnNames="id"
+                                 referencedTableName="abonent"/>
+    </changeSet>
+    <changeSet id="1703081985056-13" author="vantonov">
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="user_roles"
+                                 constraintName="fk_userol_on_role_entity" referencedColumnNames="id"
+                                 referencedTableName="role"/>
+    </changeSet>
+    <changeSet id="1703081985056-14" author="vantonov">
+        <insert tableName="role">
+            <column name="id">1</column>
+            <column name="name">ROLE_USER</column>
+            <column name="sys_name">ROLE_USER</column>
+        </insert>
+        <insert tableName="role">
+            <column name="id">2</column>
+            <column name="name">ROLE_ADMIN</column>
+            <column name="sys_name">ROLE_ADMIN</column>
+        </insert>
+    </changeSet>
+    <changeSet id="1703081985056-15" author="vantonov">
+        <insert tableName="tariff_type">
+            <column name="id">1</column>
+            <column name="code">06</column>
+            <column name="name">Безлимит 300</column>
+            <column name="price_per_min">1</column>
+            <column name="free_minutes">300</column>
+            <column name="fixed_price">100</column>
+            <column name="tariff_type">UNLIMITED_300</column>
+        </insert>
+        <insert tableName="tariff_type">
+            <column name="id">2</column>
+            <column name="code">03</column>
+            <column name="name">Поминутный</column>
+            <column name="price_per_min">1.5</column>
+            <column name="free_minutes">0</column>
+            <column name="fixed_price">0</column>
+            <column name="tariff_type">PER_MINUTE</column>
+        </insert>
+        <insert tableName="tariff_type">
+            <column name="id">3</column>
+            <column name="code">11</column>
+            <column name="name">Обычный</column>
+            <column name="price_per_min">0.5</column>
+            <column name="free_minutes">100</column>
+            <column name="fixed_price">0</column>
+            <column name="tariff_type">NORMAL</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

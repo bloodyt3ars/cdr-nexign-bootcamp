@@ -16,8 +16,6 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "admin"
       POSTGRES_DB: "homework"
-    volumes:
-      - ./src/main/resources/volumes/initDB.sql:/docker-entrypoint-initdb.d/initDB.sql
     restart: always
   app:
     image:  bloodyt3ars/nexign-cdr:release
